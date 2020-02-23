@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "name": "Frontend Admin",
+      "path": "frontend-admin-tauri/src"
+    },
+    {
+      "name": "Frontend Admin Tauri",
+      "path": "frontend-admin-tauri/src-tauri"
+    },
+    {
+      "name": "Go Server",
+      "path": "go-server"
+    }
+  ]
+}
