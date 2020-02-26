@@ -8,12 +8,12 @@ const routes = [
   {
     path: '/',
     name: 'Main',
-    component: Main
-  }
+    component: Main,
+  },
 ];
 
 const router = new VueRouter({
-  routes
+  routes,
 });
 
 export default router;

@@ -2,7 +2,10 @@
 name = "stract_admin"
 version = "0.1.0"
 description = "A Tauri App"
-author = [ "Andrii Shafar <andreyshafar@gmail.com>", "Orest Pidfihurnyi <orest988@gmail.com>" ]
+author = [
+  "Andrii Shafar <andreyshafar@gmail.com>",
+  "Orest Pidfihurnyi <orest988@gmail.com>"
+]
 license = "GPLv3"
 repository = "https://gitlab.com/Reidond/stract"
 default-run = "stract_admin"
@@ -21,6 +24,8 @@ icon = [
 
 [dependencies]
 serde_json = "1.0"
+tokio = { version = "0.2.11", features = ["full"] }
+tokio-process = "0.3.0-alpha.2"
 serde = { version = "1.0", features = [ "derive" ] }
 tauri = { version = "0.4", features = [ "all-api", "edge" ] }
 
