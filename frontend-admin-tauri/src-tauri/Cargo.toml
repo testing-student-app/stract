@@ -24,8 +24,6 @@ icon = [
 
 [dependencies]
 serde_json = "1.0"
-tokio = { version = "0.2.11", features = ["full"] }
-tokio-process = "0.3.0-alpha.2"
 serde = { version = "1.0", features = [ "derive" ] }
 tauri = { version = "0.4", features = [ "all-api", "edge" ] }
 
