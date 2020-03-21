@@ -1,0 +1,13 @@
+[package]
+name = "xtask"
+version = "0.1.0"
+authors = ["Reidond <reidond@gmail.com>"]
+edition = "2018"
+publish = false
+
+[lib]
+doctest = false
+
+[dependencies]
+tokio = { version = "0.2.13", features = [ "full" ] }
+pico-args = "0.3.1"
