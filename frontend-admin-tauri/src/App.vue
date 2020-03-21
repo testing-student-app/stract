@@ -17,3 +17,9 @@ export default {
   name: 'App',
 };
 </script>
+
+<style lang="scss">
+html {
+  overflow-y: hidden !important;
+}
+</style>
