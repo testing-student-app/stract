@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -38,6 +40,8 @@ var upgrader = websocket.Upgrader{
 type Client struct {
 	hub *Hub
 
+	admin bool
+
 	// The websocket connection.
 	conn *websocket.Conn
 
@@ -47,8 +51,8 @@ type Client struct {
 
 // Data ...
 type Data struct {
-	c Client
-	p []byte
+	Action string      `json:"action"`
+	Paylod interface{} `json:"payload"`
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -74,16 +78,17 @@ func (c *Client) readPump() {
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 
-		str := []byte(" for all")
+		fmt.Printf("\nData: %s", string(message))
 
-		if bytes.Contains(message, []byte("all:")) {
-			c.hub.broadcast <- append(message, str...)
+		var d Data
+
+		err2 := json.Unmarshal(message, &d)
+
+		if err2 != nil {
+			fmt.Printf("\nError: %s", err2)
 		}
 
-		if bytes.Contains(message, []byte("me:")) {
-			c.send <- append(message, []byte(" for you")...)
-		}
-
+		c.hub.handler.Emmit(d.Action, c, d.Paylod)
 	}
 }
 
@@ -134,13 +139,13 @@ func (c *Client) writePump() {
 }
 
 // serveWs handles websocket requests from the peer.
-func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+func serveWs(hub *Hub, admin bool, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client := &Client{hub: hub, admin: admin, conn: conn, send: make(chan []byte, 256)}
 	client.hub.register <- client
 
 	// Allow collection of memory referenced by the caller by doing all work in

@@ -1,12 +1,9 @@
 #[cfg(windows)]
 extern crate winres;
 
-use tokio_process::Command;
-
 fn build_go_server() {}
 
 #[cfg(windows)]
-#[tokio::main]
 fn main() {
   build_go_server();
   if std::path::Path::new("icons/icon.ico").exists() {
@@ -19,7 +16,6 @@ fn main() {
 }
 
 #[cfg(not(windows))]
-#[tokio::main]
 async fn main() {
   build_go_server();
 }

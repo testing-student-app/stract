@@ -4,7 +4,9 @@ package main
 // clients.
 type Hub struct {
 	// Registered clients.
-	clients map[*Client]bool
+	clients map[*Client]string
+
+	admin *Client
 
 	// Inbound messages from the clients.
 	broadcast chan []byte
@@ -14,14 +16,18 @@ type Hub struct {
 
 	// Unregister requests from clients.
 	unregister chan *Client
+
+	handler *Handler
 }
 
-func newHub() *Hub {
+func newHub(h *Handler) *Hub {
 	return &Hub{
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		clients:    make(map[*Client]bool),
+		clients:    make(map[*Client]string),
+		admin:      nil,
+		handler:    h,
 	}
 }
 
@@ -29,10 +35,18 @@ func (h *Hub) run() {
 	for {
 		select {
 		case client := <-h.register:
-			h.clients[client] = true
+			if !client.admin {
+				h.clients[client] = client.conn.LocalAddr().String()
+				h.handler.Emmit("clientlist", client, nil)
+			} else {
+				h.admin = client
+			}
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
+				close(client.send)
+				h.handler.Emmit("clientlist", client, nil)
+			} else {
 				close(client.send)
 			}
 		case message := <-h.broadcast:

@@ -74,3 +74,4 @@ target
 Cargo.lock
 
 WixTools/
+go-server/stract.exe
