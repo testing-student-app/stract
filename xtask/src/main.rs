@@ -1,34 +1,64 @@
 use pico_args::Arguments;
+use tokio;
 
-use std::fs;
-use std::path::{Path, PathBuf};
-use xtask::project_root;
+use xtask::{check_node_modules, configure_paths, move_file};
 
-async fn move_go_server(source: PathBuf, target: PathBuf) -> std::io::Result<()> {
-    if !target.exists() {
-        fs::create_dir(&target)?;
-    }
+async fn serve() -> Result<(), Box<dyn std::error::Error>> {
+    let (go_server_path, admin_core_path) = configure_paths("debug");
 
-    fs::copy(&source, &target)?;
-    fs::remove_file(source)?;
+    // Go Server Compile
+    tokio::process::Command::new("go")
+        .arg("build")
+        .arg("-o")
+        .arg("go-server")
+        .current_dir("./go-server")
+        .spawn()
+        .expect("failed to build go server")
+        .await?;
+
+    move_file(go_server_path, admin_core_path).await?;
+
+    check_node_modules("admin_core").await?;
+
+    // npm run tauri:serve
+    tokio::process::Command::new("npm")
+        .arg("run")
+        .arg("tauri:serve")
+        .current_dir("./admin_core")
+        .spawn()
+        .expect("failed to serve tauri")
+        .await?;
 
     Ok(())
 }
 
-async fn serve() {
-    let mut go_server_root: PathBuf = project_root();
-    go_server_root.push("go-server");
-
-    let mut admin_tauri: PathBuf = project_root();
-    admin_tauri.push("frontend-admin-taur");
+async fn build() -> Result<(), Box<dyn std::error::Error>> {
+    let (go_server_path, admin_core_path) = configure_paths("release");
 
     // Go Server Compile
-    tokio::spawn(async move {});
+    tokio::process::Command::new("go")
+        .arg("build")
+        .arg("-o")
+        .arg("go-server")
+        .current_dir("./go-server")
+        .spawn()
+        .expect("failed to build go server")
+        .await?;
 
-    move_go_server().await;
+    move_file(go_server_path, admin_core_path).await?;
 
-    // npm run tauri:serve
-    tokio::spawn(async move {});
+    check_node_modules("admin_core").await?;
+
+    // npm run tauri:build
+    tokio::process::Command::new("npm")
+        .arg("run")
+        .arg("tauri:build")
+        .current_dir("./admin_core")
+        .spawn()
+        .expect("failed to build tauri")
+        .await?;
+
+    Ok(())
 }
 
 #[tokio::main]
@@ -38,10 +68,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match subcommand.as_str() {
         "serve" => {
-            serve().await;
+            serve().await?;
             Ok(())
         }
-        "build" => Ok(()),
+        "build" => {
+            build().await?;
+            Ok(())
+        }
         _ => {
             eprintln!(
                 "\
