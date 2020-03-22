@@ -41,7 +41,7 @@ pub async fn check_node_modules(package_name: &str) -> Result<(), Box<dyn std::e
     node_modules.push("node_modules");
 
     if !node_modules.exists() {
-        tokio::process::Command::new("npm")
+        create_npm_process()
             .arg("i")
             .current_dir(node_modules.parent().unwrap())
             .spawn()
@@ -78,4 +78,16 @@ pub async fn compile_go_server() -> Result<(), Box<dyn std::error::Error>> {
         .await?;
 
     Ok(())
+}
+
+#[cfg(not(windows))]
+pub fn create_npm_process() -> tokio::process::Command {
+    tokio::process::Command::new("npm")
+}
+
+#[cfg(windows)]
+pub fn create_npm_process() -> tokio::process::Command {
+    let mut cmd = tokio::process::Command::new("powershell");
+    cmd.arg("-c").arg("npm");
+    cmd
 }
