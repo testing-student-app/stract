@@ -1,20 +1,13 @@
 use pico_args::Arguments;
 use tokio;
 
-use xtask::{check_node_modules, configure_paths, move_file};
+use xtask::{check_node_modules, compile_go_server, configure_paths, move_file};
 
 async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     let (go_server_path, admin_core_path) = configure_paths("debug");
 
     // Go Server Compile
-    tokio::process::Command::new("go")
-        .arg("build")
-        .arg("-o")
-        .arg("go-server")
-        .current_dir("./go-server")
-        .spawn()
-        .expect("failed to build go server")
-        .await?;
+    compile_go_server().await?;
 
     move_file(go_server_path, admin_core_path).await?;
 
@@ -36,14 +29,7 @@ async fn build() -> Result<(), Box<dyn std::error::Error>> {
     let (go_server_path, admin_core_path) = configure_paths("release");
 
     // Go Server Compile
-    tokio::process::Command::new("go")
-        .arg("build")
-        .arg("-o")
-        .arg("go-server")
-        .current_dir("./go-server")
-        .spawn()
-        .expect("failed to build go server")
-        .await?;
+    compile_go_server().await?;
 
     move_file(go_server_path, admin_core_path).await?;
 
@@ -75,6 +61,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             build().await?;
             Ok(())
         }
+        "server" => {
+            compile_go_server().await?;
+            Ok(())
+        }
         _ => {
             eprintln!(
                 "\
@@ -84,7 +74,8 @@ USAGE:
     cargo xtask <SUBCOMMAND>
 SUBCOMMANDS:
     serve
-    build"
+    build
+    server"
             );
             Ok(())
         }

@@ -66,3 +66,16 @@ pub fn configure_paths(build_profile: &str) -> (PathBuf, PathBuf) {
 
     (go_server_path, admin_core_path)
 }
+
+pub async fn compile_go_server() -> Result<(), Box<dyn std::error::Error>> {
+    tokio::process::Command::new("go")
+        .arg("build")
+        .arg("-o")
+        .arg("go-server")
+        .current_dir("./go-server")
+        .spawn()
+        .expect("failed to build go server")
+        .await?;
+
+    Ok(())
+}
