@@ -1,4 +1,4 @@
-# frontend-admin-tauri
+# admin_core
 
 ## Project setup
 ```
