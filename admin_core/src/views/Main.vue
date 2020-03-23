@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-container v-if="serverLoading" fluid>
+    <v-container v-if="!serverLoaded" fluid>
       <loader></loader>
     </v-container>
     <v-container v-else fluid>
@@ -36,18 +36,14 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
-import Loader from '@/components/Loader.vue';
-// import tauri from 'tauri/api';
+import { mapState } from 'vuex';
+import Loader from '../components/Loader.vue';
 
 export default {
   name: 'Main',
   components: { Loader },
   computed: mapState({
-    serverLoading: state => state.serverLoading,
+    serverLoaded: state => state.serverLoaded,
   }),
-  methods: {
-    ...mapActions(['toggleServerLoading']),
-  },
 };
 </script>

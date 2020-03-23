@@ -1,16 +1,19 @@
 {
   "folders": [
     {
-      "name": "Frontend Admin",
-      "path": "frontend-admin-tauri/src"
+      "name": "Admin Core",
+      "path": "admin_core/src"
     },
     {
-      "name": "Frontend Admin Tauri",
-      "path": "frontend-admin-tauri/src-tauri"
+      "name": "Admin Tauri",
+      "path": "admin_core/src-tauri"
     },
     {
       "name": "Go Server",
       "path": "go-server"
+    },
+    {
+      "path": "xtask"
     }
   ]
 }
