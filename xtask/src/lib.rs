@@ -67,11 +67,21 @@ pub fn configure_paths(build_profile: &str) -> (PathBuf, PathBuf) {
     (go_server_path, admin_core_path)
 }
 
+#[cfg(not(windows))]
+fn go_server_outputname() -> String {
+    String::from("go-server")
+}
+
+#[cfg(windows)]
+fn go_server_outputname() -> String {
+    String::from("go-server.exe")
+}
+
 pub async fn compile_go_server() -> Result<(), Box<dyn std::error::Error>> {
     tokio::process::Command::new("go")
         .arg("build")
         .arg("-o")
-        .arg("go-server")
+        .arg(go_server_outputname())
         .current_dir("./go-server")
         .spawn()
         .expect("failed to build go server")
