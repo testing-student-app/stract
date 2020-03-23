@@ -7,6 +7,16 @@ mod cmd;
 
 use std::env;
 
+#[cfg(not(windows))]
+fn go_server_execname() -> String {
+    String::from("./go-server")
+}
+
+#[cfg(windows)]
+fn go_server_execname() -> String {
+    String::from("go-server.exe")
+}
+
 fn main() {
     tauri::AppBuilder::new()
         .invoke_handler(|_webview, arg| {
@@ -21,7 +31,7 @@ fn main() {
                             let target_exe = env::current_exe()?;
                             let target_dir = target_exe.parent().unwrap();
 
-                            std::process::Command::new("./go-server")
+                            std::process::Command::new(go_server_execname())
                                 .arg("-addr")
                                 .arg(":8081")
                                 .current_dir(target_dir)
