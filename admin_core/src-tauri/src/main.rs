@@ -6,10 +6,8 @@
 mod cmd;
 
 use std::env;
-use std::sync::{Arc, Mutex};
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() {
     tauri::AppBuilder::new()
         .invoke_handler(|_webview, arg| {
             use cmd::Cmd::*;
@@ -40,6 +38,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         })
         .build()
         .run();
-
-    Ok(())
 }
