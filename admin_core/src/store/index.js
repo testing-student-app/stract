@@ -5,16 +5,23 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    serverLoading: false,
+    serverLoaded: false,
+    serverStatus: '',
   },
   mutations: {
-    TOGGLE_SERVER_LOADING(state) {
-      state.serverLoading = !state.serverLoading;
+    TOGGLE_SERVER_LOADED(state) {
+      state.serverLoaded = !state.serverLoaded;
+    },
+    SET_SERVER_STATUS(state, status) {
+      state.serverStatus = status;
     },
   },
   actions: {
-    toggleServerLoading({ commit }) {
-      commit('TOGGLE_SERVER_LOADING');
+    toggleServerLoaded({ commit }) {
+      commit('TOGGLE_SERVER_LOADED');
+    },
+    setServerStatus({ commit }, status) {
+      commit('SET_SERVER_STATUS', status);
     },
   },
   modules: {},
