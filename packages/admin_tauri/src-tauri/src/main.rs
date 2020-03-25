@@ -6,24 +6,8 @@
 mod cmd;
 
 use std::env;
-
-#[derive(Serialize)]
-struct ServerReply {
-    status: String,
-    port: u16,
-}
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-#[cfg(not(windows))]
-fn go_server_execname() -> String {
-    String::from("./go-server")
-}
-
-#[cfg(windows)]
-fn go_server_execname() -> String {
-    String::from("go-server.exe")
-}
+use std::process::Command;
+use stract_admin::{go_server_execname, kill, pidof, ServerReply};
 
 fn main() {
     tauri::AppBuilder::new()
@@ -40,16 +24,19 @@ fn main() {
                             let target_dir = target_exe.parent().unwrap();
                             let port: u16 = 8081;
 
-                            std::process::Command::new(go_server_execname())
+                            let output = Command::new(go_server_execname())
                                 .arg("-addr")
                                 .arg(format!(":{}", port))
                                 .current_dir(target_dir)
-                                .spawn()
-                                .expect("failed to execute go-server");
+                                .output()?;
+
+                            if !output.status.success() {
+                                return Err("failed".into());
+                            };
 
                             let reply = ServerReply {
                                 status: String::from("started"),
-                                port,
+                                port: Some(port),
                             };
 
                             Ok(serde_json::to_string(&reply).unwrap())
@@ -57,6 +44,10 @@ fn main() {
                         callback,
                         error,
                     ),
+                    DestroyServer => {
+                        let pid = pidof("go-server");
+                        kill(pid).unwrap();
+                    }
                 },
             }
         })

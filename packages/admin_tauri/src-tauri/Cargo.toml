@@ -23,9 +23,9 @@ icon = [
 ]
 
 [dependencies]
-tokio = { version = "0.2.13", features = [ "full" ] }
-serde_json = "1.0"
-serde = { version = "1.0", features = [ "derive" ] }
+duct = "0.13.3"
+serde_json = "1.0.48"
+serde = { version = "1.0.105", features = [ "derive" ] }
 tauri = { version = "0.4", features = [ "all-api", "edge" ] }
 
 [target."cfg(windows)".build-dependencies]
