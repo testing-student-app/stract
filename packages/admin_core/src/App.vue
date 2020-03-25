@@ -40,13 +40,14 @@ export default {
       .promisified({
         cmd: 'loadServer',
       })
-      .then(({ status }) => {
+      .then(({ status, port }) => {
+        this.setServerPort(port);
         this.setServerStatus(status);
         this.toggleServerLoaded();
       });
   },
   methods: {
-    ...mapActions(['toggleServerLoaded', 'setServerStatus']),
+    ...mapActions(['toggleServerLoaded', 'setServerStatus', 'setServerPort']),
   },
 };
 </script>
