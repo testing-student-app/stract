@@ -6,7 +6,6 @@
 mod cmd;
 
 use std::env;
-use std::sync::{Arc, Mutex};
 
 #[derive(Serialize)]
 struct ServerReply {
@@ -16,6 +15,17 @@ struct ServerReply {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[cfg(not(windows))]
+fn go_server_execname() -> String {
+    String::from("./go-server")
+}
+
+#[cfg(windows)]
+fn go_server_execname() -> String {
+    String::from("go-server.exe")
+}
+
+fn main() {
     tauri::AppBuilder::new()
         .invoke_handler(|_webview, arg| {
             use cmd::Cmd::*;
@@ -30,7 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             let target_dir = target_exe.parent().unwrap();
                             let port: u16 = 8081;
 
-                            std::process::Command::new("./go-server")
+                            std::process::Command::new(go_server_execname())
                                 .arg("-addr")
                                 .arg(format!(":{}", port))
                                 .current_dir(target_dir)
@@ -52,6 +62,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         })
         .build()
         .run();
-
-    Ok(())
 }

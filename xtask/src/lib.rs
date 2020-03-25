@@ -37,6 +37,7 @@ pub async fn move_file(source: PathBuf, target: PathBuf) -> std::io::Result<()> 
 
 pub async fn check_node_modules(package_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut node_modules = project_root();
+    node_modules.push("packages");
     node_modules.push(package_name);
     node_modules.push("node_modules");
 
@@ -54,25 +55,37 @@ pub async fn check_node_modules(package_name: &str) -> Result<(), Box<dyn std::e
 
 pub fn configure_paths(build_profile: &str) -> (PathBuf, PathBuf) {
     let mut go_server_path: PathBuf = project_root();
+    go_server_path.push("packages");
     go_server_path.push("go-server");
-    go_server_path.push("go-server");
+    go_server_path.push(go_server_outputname());
 
     let mut admin_core_path: PathBuf = project_root();
-    admin_core_path.push("admin_core");
+    admin_core_path.push("packages");
+    admin_core_path.push("admin_tauri");
     admin_core_path.push("src-tauri");
     admin_core_path.push("target");
     admin_core_path.push(build_profile);
-    admin_core_path.push("go-server");
+    admin_core_path.push(go_server_outputname());
 
     (go_server_path, admin_core_path)
+}
+
+#[cfg(not(windows))]
+fn go_server_outputname() -> String {
+    String::from("go-server")
+}
+
+#[cfg(windows)]
+fn go_server_outputname() -> String {
+    String::from("go-server.exe")
 }
 
 pub async fn compile_go_server() -> Result<(), Box<dyn std::error::Error>> {
     tokio::process::Command::new("go")
         .arg("build")
         .arg("-o")
-        .arg("go-server")
-        .current_dir("./go-server")
+        .arg(go_server_outputname())
+        .current_dir("./packages/go-server")
         .spawn()
         .expect("failed to build go server")
         .await?;
@@ -90,4 +103,40 @@ pub fn create_npm_process() -> tokio::process::Command {
     let mut cmd = tokio::process::Command::new("powershell");
     cmd.arg("-c").arg("npm");
     cmd
+}
+
+pub fn create_symlinks() -> std::io::Result<()> {
+    #[cfg(not(windows))]
+    {
+        std::os::unix::fs::symlink(
+            "./packages/admin_tauri/src-tauri",
+            "./packages/admin_core/src-tauri",
+        )?;
+    };
+
+    #[cfg(windows)]
+    {
+        let root = project_root().join("packages");
+        std::os::windows::fs::symlink_dir(
+            root.join("admin_tauri").join("src-tauri/"),
+            root.join("admin_core").join("src-tauri"),
+        )?;
+    };
+
+    Ok(())
+}
+
+pub fn remove_symlinks() -> std::io::Result<()> {
+    #[cfg(not(windows))]
+    {
+        std::fs::remove_file("./packages/admin_core/src-tauri")?;
+    };
+
+    #[cfg(windows)]
+    {
+        let root = project_root().join("packages");
+        std::fs::remove_dir(root.join("admin_core").join("src-tauri"))?;
+    };
+
+    Ok(())
 }

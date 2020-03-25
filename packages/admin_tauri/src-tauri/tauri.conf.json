@@ -1,6 +1,6 @@
 {
   "build": {
-    "distDir": "../dist",
+    "distDir": "../../admin_core/dist",
     "devPath": "http://localhost:8080"
   },
   "ctx": {},
