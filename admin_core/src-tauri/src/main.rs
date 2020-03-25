@@ -8,6 +8,12 @@ mod cmd;
 use std::env;
 use std::sync::{Arc, Mutex};
 
+#[derive(Serialize)]
+struct ServerReply {
+    status: String,
+    port: u16,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tauri::AppBuilder::new()
@@ -22,15 +28,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         move || {
                             let target_exe = env::current_exe()?;
                             let target_dir = target_exe.parent().unwrap();
+                            let port: u16 = 8081;
 
                             std::process::Command::new("./go-server")
                                 .arg("-addr")
-                                .arg(":8081")
+                                .arg(format!(":{}", port))
                                 .current_dir(target_dir)
                                 .spawn()
                                 .expect("failed to execute go-server");
 
-                            Ok("{status: 'started'}".to_string())
+                            let reply = ServerReply {
+                                status: String::from("started"),
+                                port,
+                            };
+
+                            Ok(serde_json::to_string(&reply).unwrap())
                         },
                         callback,
                         error,

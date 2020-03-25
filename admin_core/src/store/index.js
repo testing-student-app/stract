@@ -7,6 +7,7 @@ export default new Vuex.Store({
   state: {
     serverLoaded: false,
     serverStatus: '',
+    serverPort: 8081,
   },
   mutations: {
     TOGGLE_SERVER_LOADED(state) {
@@ -15,6 +16,9 @@ export default new Vuex.Store({
     SET_SERVER_STATUS(state, status) {
       state.serverStatus = status;
     },
+    SET_SERVER_PORT(state, port) {
+      state.serverPort = port;
+    },
   },
   actions: {
     toggleServerLoaded({ commit }) {
@@ -22,6 +26,9 @@ export default new Vuex.Store({
     },
     setServerStatus({ commit }, status) {
       commit('SET_SERVER_STATUS', status);
+    },
+    setServerPort({ commit }, port) {
+      commit('SET_SERVER_PORT', port);
     },
   },
   modules: {},
