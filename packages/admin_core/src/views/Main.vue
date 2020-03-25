@@ -1,47 +1,25 @@
 <template>
   <div>
-    <!-- <v-container v-if="!serverLoaded" fluid>
-      <loader></loader>
-    </v-container>
-    <v-container v-else fluid>
-      <v-row align-content="center" align="stretch">
-        <v-col cols="12">
-          <v-text-field label="Message" single-line filled></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row align-content="space-between" align="stretch">
-        <v-col cols="6">
-          <v-card class="mx-auto">
-            <v-card-title>Connected Users</v-card-title>
-
-            <v-card-text>1,000 miles of wonder</v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="6">
-          <v-card class="mx-auto">
-            <v-textarea
-              outlined
-              name="input-7-4"
-              label="Server Output"
-            ></v-textarea>
-
-            <v-card-actions>
-              <v-btn text>Clear</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container> -->
+    <b-container fluid>
+      <b-row>
+        <b-col cols="4">
+          <h3 class="font-weight-bold">Connected Users</h3>
+          <b-list-group>
+            <b-list-group-item>Cras justo odio</b-list-group-item>
+            <b-list-group-item>Dapibus ac facilisis in</b-list-group-item>
+            <b-list-group-item>Morbi leo risus</b-list-group-item>
+            <b-list-group-item>Porta ac consectetur ac</b-list-group-item>
+            <b-list-group-item>Vestibulum at eros</b-list-group-item>
+          </b-list-group>
+        </b-col>
+        <b-col cols="8"> </b-col>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
-
 export default {
   name: 'Main',
-  computed: mapState({
-    serverLoaded: state => state.serverLoaded,
-  }),
 };
 </script>

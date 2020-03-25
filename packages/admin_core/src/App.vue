@@ -1,20 +1,26 @@
 <template>
-  <h1>HI</h1>
-  <!-- <v-app>
-    <v-app-bar app dense>
-      <v-toolbar-title>Stract Admin</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-toolbar-title v-if="serverStatus === 'started'"
-        >Not connected, server running</v-toolbar-title
-      >
-    </v-app-bar>
+  <b-overlay :show="serverLoaded" rounded="sm">
+    <b-navbar variant="dark" class="mb-3">
+      <b-navbar-brand>
+        <b-badge v-if="serverStatus === 'started'" class="text-wrap">
+          Not connected, server running
+        </b-badge>
+        <b-badge v-else variant="danger" class="text-wrap">
+          Not connected, server not running
+        </b-badge>
+      </b-navbar-brand>
 
-    <v-content>
-      <v-container fluid>
-        <router-view></router-view>
-      </v-container>
-    </v-content>
-  </v-app> -->
+      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+      <b-collapse id="nav-collapse" is-nav>
+        <!-- Right aligned nav items -->
+        <b-navbar-nav class="ml-auto"> </b-navbar-nav>
+      </b-collapse>
+    </b-navbar>
+    <b-container fluid>
+      <router-view></router-view>
+    </b-container>
+  </b-overlay>
 </template>
 
 <script>
@@ -25,6 +31,7 @@ export default {
   name: 'App',
   computed: {
     ...mapState({
+      serverLoaded: state => state.serverLoaded,
       serverStatus: state => state.serverStatus,
     }),
   },
