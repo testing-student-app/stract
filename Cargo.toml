@@ -5,5 +5,5 @@ members = [
 ]
 
 exclude = [
-  "admin_core/src-tauri"
+  "packages/admin_tauri/src-tauri"
 ]
