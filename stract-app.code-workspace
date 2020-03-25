@@ -2,15 +2,15 @@
   "folders": [
     {
       "name": "Admin Core",
-      "path": "admin_core/src"
+      "path": "packages/admin_core"
     },
     {
       "name": "Admin Tauri",
-      "path": "admin_core/src-tauri"
+      "path": "packages/admin_tauri"
     },
     {
       "name": "Go Server",
-      "path": "go-server"
+      "path": "packages/go-server"
     },
     {
       "path": "xtask"
