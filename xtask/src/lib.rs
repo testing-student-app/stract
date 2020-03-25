@@ -2,6 +2,7 @@ use std::{
     env, fs,
     path::{Path, PathBuf},
 };
+use symlink;
 
 pub fn project_root() -> PathBuf {
     Path::new(
@@ -106,37 +107,16 @@ pub fn create_npm_process() -> tokio::process::Command {
 }
 
 pub fn create_symlinks() -> std::io::Result<()> {
-    #[cfg(not(windows))]
-    {
-        std::os::unix::fs::symlink(
-            "./packages/admin_tauri/src-tauri",
-            "./packages/admin_core/src-tauri",
-        )?;
-    };
-
-    #[cfg(windows)]
-    {
-        let root = project_root().join("packages");
-        std::os::windows::fs::symlink_dir(
-            root.join("admin_tauri").join("src-tauri/"),
-            root.join("admin_core").join("src-tauri"),
-        )?;
-    };
-
+    let root = project_root().join("packages");
+    symlink::symlink_dir(
+        root.join("admin_tauri").join("src-tauri/"),
+        root.join("admin_core").join("src-tauri"),
+    )?;
     Ok(())
 }
 
 pub fn remove_symlinks() -> std::io::Result<()> {
-    #[cfg(not(windows))]
-    {
-        std::fs::remove_file("./packages/admin_core/src-tauri")?;
-    };
-
-    #[cfg(windows)]
-    {
-        let root = project_root().join("packages");
-        std::fs::remove_dir(root.join("admin_core").join("src-tauri"))?;
-    };
-
+    let root = project_root().join("packages");
+    symlink::remove_symlink_dir(root.join("admin_core").join("src-tauri"))?;
     Ok(())
 }
