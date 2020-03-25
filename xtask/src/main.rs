@@ -2,7 +2,8 @@ use pico_args::Arguments;
 use tokio;
 
 use xtask::{
-    check_node_modules, compile_go_server, configure_paths, create_npm_process, move_file,
+    check_node_modules, compile_go_server, configure_paths, create_npm_process, create_symlinks,
+    move_file, remove_symlinks,
 };
 
 async fn serve() -> Result<(), Box<dyn std::error::Error>> {
@@ -15,14 +16,18 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
 
     check_node_modules("admin_core").await?;
 
-    // npm run tauri:serve
+    create_symlinks()?;
+
+    // npm run serve
     create_npm_process()
         .arg("run")
         .arg("tauri:serve")
-        .current_dir("./admin_core")
+        .current_dir("./packages/admin_core")
         .spawn()
-        .expect("failed to serve tauri")
+        .expect("failed to serve")
         .await?;
+
+    remove_symlinks()?;
 
     Ok(())
 }
@@ -37,14 +42,18 @@ async fn build() -> Result<(), Box<dyn std::error::Error>> {
 
     check_node_modules("admin_core").await?;
 
+    create_symlinks()?;
+
     // npm run tauri:build
     create_npm_process()
         .arg("run")
         .arg("tauri:build")
-        .current_dir("./admin_core")
+        .current_dir("./packages/admin_core")
         .spawn()
         .expect("failed to build tauri")
         .await?;
+
+    remove_symlinks()?;
 
     Ok(())
 }

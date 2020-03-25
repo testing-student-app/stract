@@ -74,8 +74,10 @@ target
 Cargo.lock
 
 WixTools/
-go-server/go-server
-go-server/go-server.exe
+packages/go-server/go-server
+packages/go-server/go-server.exe
 
 /bin
 /pkg
+
+packages/admin_core/src-tauri
