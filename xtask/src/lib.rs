@@ -71,7 +71,7 @@ pub fn configure_paths(build_profile: &str) -> (PathBuf, PathBuf) {
     (go_server_path, admin_core_path)
 }
 
-#[cfg(not(windows))]
+#[cfg(unix)]
 fn go_server_outputname() -> String {
     String::from("go-server")
 }
@@ -94,7 +94,7 @@ pub async fn compile_go_server() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[cfg(not(windows))]
+#[cfg(unix)]
 pub fn create_npm_process() -> tokio::process::Command {
     tokio::process::Command::new("npm")
 }
@@ -108,10 +108,16 @@ pub fn create_npm_process() -> tokio::process::Command {
 
 pub fn create_symlinks() -> std::io::Result<()> {
     let root = project_root().join("packages");
+
+    if root.join("admin_core").join("src-tauri").exists() {
+        remove_symlinks()?;
+    };
+
     symlink::symlink_dir(
         root.join("admin_tauri").join("src-tauri/"),
         root.join("admin_core").join("src-tauri"),
     )?;
+
     Ok(())
 }
 

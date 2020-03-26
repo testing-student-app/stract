@@ -29,7 +29,11 @@ pub fn pidof(process_name: &str) -> u16 {
 
 #[cfg(windows)]
 pub fn pidof(process_name: &str) -> u16 {
-    cmd!("powershell", "-c", format!("Get-Process | where {{$_.ProcessName -eq '{}'}} | select Id | ForEach-Object {{$_.Id}} | Out-String -stream", process_name)).read().unwrap().parse::<u16>().unwrap()
+    cmd!(
+        "powershell",
+        "-c",
+        format!("Get-Process | where {{$_.ProcessName -eq '{}'}} | select Id | ForEach-Object {{$_.Id}} | Out-String -stream", process_name))
+    .read().unwrap().parse::<u16>().unwrap()
 }
 
 #[cfg(unix)]
@@ -40,6 +44,11 @@ pub fn kill(pid: u16) -> io::Result<()> {
 
 #[cfg(windows)]
 pub fn kill(pid: u16) -> io::Result<()> {
-    cmd!("powershell", "-c", format!("Stop-Process -ID {} -Force", pid.to_string())).run()?;
+    cmd!(
+        "powershell",
+        "-c",
+        format!("Stop-Process -ID {} -Force", pid.to_string())
+    )
+    .run()?;
     Ok(())
 }
