@@ -39,4 +39,7 @@ pub fn kill(pid: u16) -> io::Result<()> {
 }
 
 #[cfg(windows)]
-pub fn kill(pid: u16) {}
+pub fn kill(pid: u16) -> io::Result<()> {
+    cmd!("powershell", "-c", format!("Stop-Process -ID {} -Force", pid.to_string())).run()?;
+    Ok(())
+}
