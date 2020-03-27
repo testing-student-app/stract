@@ -41,13 +41,13 @@ export default {
         cmd: 'loadServer',
       })
       .then(({ status, port }) => {
-        this.setServerPort(port);
         this.setServerStatus(status);
         this.toggleServerLoaded();
+        this.$websocket.connect(port);
       });
   },
   methods: {
-    ...mapActions(['toggleServerLoaded', 'setServerStatus', 'setServerPort']),
+    ...mapActions(['toggleServerLoaded', 'setServerStatus']),
   },
 };
 </script>
