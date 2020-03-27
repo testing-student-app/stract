@@ -71,12 +71,12 @@ pub fn configure_paths(build_profile: &str) -> (PathBuf, PathBuf) {
     (go_server_path, admin_core_path)
 }
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 fn go_server_outputname() -> String {
     String::from("go-server")
 }
 
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 fn go_server_outputname() -> String {
     String::from("go-server.exe")
 }
@@ -94,12 +94,12 @@ pub async fn compile_go_server() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 pub fn create_npm_process() -> tokio::process::Command {
     tokio::process::Command::new("npm")
 }
 
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 pub fn create_npm_process() -> tokio::process::Command {
     let mut cmd = tokio::process::Command::new("powershell");
     cmd.arg("-c").arg("npm");

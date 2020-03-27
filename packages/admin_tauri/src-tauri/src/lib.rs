@@ -8,17 +8,17 @@ pub struct ServerReply {
     pub port: Option<u16>,
 }
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 pub fn go_server_execname() -> String {
     String::from("./go-server")
 }
 
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 pub fn go_server_execname() -> String {
     String::from("go-server.exe")
 }
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 pub fn pidof(process_name: &str) -> u16 {
     cmd!("pidof", process_name)
         .read()
@@ -27,22 +27,18 @@ pub fn pidof(process_name: &str) -> u16 {
         .unwrap()
 }
 
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 pub fn pidof(process_name: &str) -> u16 {
-    cmd!(
-        "powershell",
-        "-c",
-        format!("Get-Process | where {{$_.ProcessName -eq '{}'}} | select Id | ForEach-Object {{$_.Id}} | Out-String -stream", process_name))
-    .read().unwrap().parse::<u16>().unwrap()
+    cmd!("powershell","-c",format!("Get-Process | where {{$_.ProcessName -eq '{}'}} | select Id | ForEach-Object {{$_.Id}} | Out-String -stream",process_name)).read().unwrap().parse::<u16>().unwrap()
 }
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 pub fn kill(pid: u16) -> io::Result<()> {
     cmd!("kill", pid.to_string()).run()?;
     Ok(())
 }
 
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 pub fn kill(pid: u16) -> io::Result<()> {
     cmd!(
         "powershell",
