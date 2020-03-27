@@ -29,7 +29,15 @@ pub fn pidof(process_name: &str) -> u16 {
 
 #[cfg(windows)]
 pub fn pidof(process_name: &str) -> u16 {
-    cmd!("powershell", "-c", format!("Get-Process | where {{$_.ProcessName -eq '{}'}} | select Id | ForEach-Object {{$_.Id}} | Out-String -stream", process_name)).read().unwrap().parse::<u16>().unwrap()
+    let script = format!(
+        "Get-Process | where {{$_.ProcessName -eq '{}'}} | select Id | ForEach-Object {{$_.Id}} | Out-String -stream",
+        process_name
+    );
+    cmd!("powershell", "-c", script)
+        .read()
+        .unwrap()
+        .parse::<u16>()
+        .unwrap()
 }
 
 #[cfg(unix)]
