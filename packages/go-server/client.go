@@ -88,7 +88,7 @@ func (c *Client) readPump() {
 			fmt.Printf("\nError: %s", err2)
 		}
 
-		c.hub.handler.InnerEmit(d.Action, c, d.Paylod)
+		c.hub.handler.InternalEmit(d.Action, c, d.Paylod)
 	}
 }
 

@@ -17,8 +17,8 @@ func (h *Handler) On(an string, a func(c *Client, p interface{})) {
 	h.events[an] = a
 }
 
-// InnerEmit emit inner handler functions
-func (h *Handler) InnerEmit(an string, c *Client, p interface{}) {
+// InternalEmit emit internal handler functions
+func (h *Handler) InternalEmit(an string, c *Client, p interface{}) {
 	a, ok := h.events[an]
 
 	if ok {
