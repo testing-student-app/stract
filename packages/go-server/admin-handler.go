@@ -31,12 +31,14 @@ func (ah *AdminHandler) ClientList(c *Client, p interface{}) {
 
 	b, err := json.Marshal(WSData{
 		Action: "setUsers",
-		Paylod:   values,
+		Paylod: values,
 	})
 
 	if err != nil {
 		fmt.Printf("\nClientListError: %s", err)
 	}
 
-	c.hub.admin.send <- b
+	if c.hub.admin != nil {
+		c.hub.admin.send <- b
+	}
 }
