@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import tauri from 'tauri/api';
+// import tauri from 'tauri/api';
 import { mapActions, mapState } from 'vuex';
 
 export default {
@@ -36,14 +36,13 @@ export default {
     }),
   },
   created() {
-    tauri
+    window.tauri
       .promisified({
         cmd: 'loadServer',
       })
-      .then(({ status, port }) => {
+      .then(({ status }) => {
         this.setServerStatus(status);
         this.toggleServerLoaded();
-        this.$websocket.connect(port);
       });
     this.$ws.connect('ws://127.0.0.1:8081/ws/a');
   },
