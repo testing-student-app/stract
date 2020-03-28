@@ -26,12 +26,12 @@ func (ah *AdminHandler) Register() {
 func (ah *AdminHandler) ClientList(c *Client, p interface{}) {
 	values := []string{}
 	for _, value := range c.hub.clients {
-			values = append(values, value)
+		values = append(values, value)
 	}
 
-	b, err := json.Marshal(Data{
-		Action: "clientlist",
-		Paylod: values,
+	b, err := json.Marshal(WSData{
+		Action: "setUsers",
+		Paylod:   values,
 	})
 
 	if err != nil {

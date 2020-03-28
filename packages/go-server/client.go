@@ -49,8 +49,8 @@ type Client struct {
 	send chan []byte
 }
 
-// Data ...
-type Data struct {
+// WSData ...
+type WSData struct {
 	Action string      `json:"action"`
 	Paylod interface{} `json:"payload"`
 }
@@ -80,7 +80,7 @@ func (c *Client) readPump() {
 
 		fmt.Printf("\nData: %s", string(message))
 
-		var d Data
+		var d WSData
 
 		err2 := json.Unmarshal(message, &d)
 
@@ -88,7 +88,7 @@ func (c *Client) readPump() {
 			fmt.Printf("\nError: %s", err2)
 		}
 
-		c.hub.handler.Emmit(d.Action, c, d.Paylod)
+		c.hub.handler.InnerEmit(d.Action, c, d.Paylod)
 	}
 }
 

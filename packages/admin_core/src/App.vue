@@ -45,6 +45,7 @@ export default {
         this.setServerStatus(status);
         this.toggleServerLoaded();
       });
+    this.$ws.connect('ws://127.0.0.1:8081/ws/a');
   },
   methods: {
     ...mapActions(['toggleServerLoaded', 'setServerStatus', 'setServerPort']),
