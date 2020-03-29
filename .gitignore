@@ -81,3 +81,4 @@ packages/go-server/go-server.exe
 /pkg
 
 packages/admin_core/src-tauri
+packages/go-server/stract.exe

@@ -26,11 +26,11 @@ func (ah *AdminHandler) Register() {
 func (ah *AdminHandler) ClientList(c *Client, p interface{}) {
 	values := []string{}
 	for _, value := range c.hub.clients {
-			values = append(values, value)
+		values = append(values, value)
 	}
 
-	b, err := json.Marshal(Data{
-		Action: "clientlist",
+	b, err := json.Marshal(WSData{
+		Action: "setUsers",
 		Paylod: values,
 	})
 
@@ -38,5 +38,7 @@ func (ah *AdminHandler) ClientList(c *Client, p interface{}) {
 		fmt.Printf("\nClientListError: %s", err)
 	}
 
-	c.hub.admin.send <- b
+	if c.hub.admin != nil {
+		c.hub.admin.send <- b
+	}
 }

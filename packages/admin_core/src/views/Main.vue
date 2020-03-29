@@ -1,25 +1,25 @@
 <template>
-  <div>
-    <b-container fluid>
-      <b-row>
-        <b-col cols="4">
-          <h3 class="font-weight-bold">Connected Users</h3>
-          <b-list-group>
-            <b-list-group-item>Cras justo odio</b-list-group-item>
-            <b-list-group-item>Dapibus ac facilisis in</b-list-group-item>
-            <b-list-group-item>Morbi leo risus</b-list-group-item>
-            <b-list-group-item>Porta ac consectetur ac</b-list-group-item>
-            <b-list-group-item>Vestibulum at eros</b-list-group-item>
-          </b-list-group>
-        </b-col>
-        <b-col cols="8"> </b-col>
-      </b-row>
-    </b-container>
-  </div>
+  <b-row class="h-100">
+    <b-col cols="4" class="h-100 overflow-auto border-right">
+      <h3 class="font-weight-bold">Connected Users</h3>
+      <user-list />
+    </b-col>
+    <b-col cols="8" class="h-100">
+      <test-list />
+    </b-col>
+  </b-row>
 </template>
 
 <script>
+import UserList from '../components/UserList.vue';
+import TestList from '../components/TestList.vue';
+
 export default {
   name: 'Main',
+
+  components: {
+    UserList,
+    TestList,
+  },
 };
 </script>
