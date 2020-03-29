@@ -7,7 +7,7 @@ mod cmd;
 
 use std::env;
 use std::process::Command;
-use stract_admin::{go_server_execname, kill, pidof, ServerReply};
+use stract_admin::shell;
 
 fn main() {
     tauri::AppBuilder::new()
@@ -17,26 +17,33 @@ fn main() {
             match serde_json::from_str(arg) {
                 Err(_) => {}
                 Ok(command) => match command {
-                    LoadServer { callback, error } => tauri::execute_promise(
+                    LoadServer {
+                        port,
+                        callback,
+                        error,
+                    } => tauri::execute_promise(
                         _webview,
                         move || {
                             let target_exe = env::current_exe()?;
                             let target_dir = target_exe.parent().unwrap();
-                            let port: u16 = 8081;
 
-                            let output = Command::new(go_server_execname())
-                                .arg("-addr")
-                                .arg(format!(":{}", port))
-                                .current_dir(target_dir)
-                                .output()?;
+                            let start_server = |port: u16| {
+                                Command::new(shell::go_server_execname())
+                                    .arg("-addr")
+                                    .arg(format!(":{}", port))
+                                    .current_dir(target_dir)
+                                    .spawn()
+                                    .expect("error in running go server")
+                            };
 
-                            if !output.status.success() {
-                                return Err("failed".into());
+                            start_server(port);
+
+                            if let Err(_) = shell::pidof("go-server") {
+                                return Err(port.into());
                             };
 
                             let reply = ServerReply {
                                 status: String::from("started"),
-                                port: Some(port),
                             };
 
                             Ok(serde_json::to_string(&reply).unwrap())
@@ -45,8 +52,8 @@ fn main() {
                         error,
                     ),
                     DestroyServer => {
-                        let pid = pidof("go-server");
-                        kill(pid).unwrap();
+                        let pid = shell::pidof("go-server");
+                        shell::kill(pid).unwrap();
                     }
                 },
             }
