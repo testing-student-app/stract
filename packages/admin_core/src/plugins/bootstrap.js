@@ -11,8 +11,14 @@ import {
   ButtonPlugin,
   FormTextareaPlugin,
   ListGroupPlugin,
+  ButtonToolbarPlugin,
+  ButtonGroupPlugin,
+  TablePlugin,
 } from 'bootstrap-vue';
 
+Vue.use(TablePlugin);
+Vue.use(ButtonGroupPlugin);
+Vue.use(ButtonToolbarPlugin);
 Vue.use(IconsPlugin);
 Vue.use(NavbarPlugin);
 Vue.use(CollapsePlugin);
