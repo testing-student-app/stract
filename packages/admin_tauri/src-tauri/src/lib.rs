@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-mod shell;
+pub mod shell;
 
 #[derive(Serialize)]
 pub struct ServerReply {

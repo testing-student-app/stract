@@ -7,7 +7,7 @@ mod cmd;
 
 use std::env;
 use std::process::Command;
-use stract_admin::shell;
+use stract_admin::{shell, ServerReply};
 
 fn main() {
     tauri::AppBuilder::new()
@@ -18,7 +18,7 @@ fn main() {
                 Err(_) => {}
                 Ok(command) => match command {
                     LoadServer {
-                        port,
+                        // port,
                         callback,
                         error,
                     } => tauri::execute_promise(
@@ -36,10 +36,10 @@ fn main() {
                                     .expect("error in running go server")
                             };
 
-                            start_server(port);
+                            start_server(8081);
 
                             if let Err(_) = shell::pidof("go-server") {
-                                return Err(port.into());
+                                // return Err(port.into());
                             };
 
                             let reply = ServerReply {
@@ -52,7 +52,7 @@ fn main() {
                         error,
                     ),
                     DestroyServer => {
-                        let pid = shell::pidof("go-server");
+                        let pid = shell::pidof("go-server").unwrap();
                         shell::kill(pid).unwrap();
                     }
                 },
