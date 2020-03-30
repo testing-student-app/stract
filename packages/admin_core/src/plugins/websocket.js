@@ -8,6 +8,10 @@ const WebSocketPlugin = ({ store }) => {
     connect(url) {
       socket = new WebSocket(url);
 
+      socket.addEventListener('open', () => {
+        store.dispatch('setServerStatus', 'connected');
+      });
+
       socket.addEventListener('message', ({ data }) => {
         const { action, payload } = JSON.parse(data);
         store.dispatch(action, payload);

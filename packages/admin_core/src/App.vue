@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 import NavBar from './components/NavBar.vue';
 
@@ -23,23 +23,26 @@ export default {
   computed: {
     ...mapState({
       serverLoaded: state => state.serverLoaded,
+      serverPort: state => state.serverPort,
     }),
   },
 
+  beforeCreate() {
+    window.tauri.listen('state', ({ state }) => {
+      const { name, payload } = state;
+      this.$store.dispatch(name, payload);
+    });
+  },
+
   created() {
-    // window.tauri
-    //   .promisified({
-    //     cmd: 'loadServer',
-    //   })
-    //   .then(({ status }) => {
-    //     this.setServerStatus(status);
-    //     this.toggleServerLoaded();
-    //   });
-    this.$ws.connect('ws://127.0.0.1:8081/ws/a');
+    if (this.serverLoaded) {
+      this.setServerStatus('started');
+      this.$ws.connect(`ws://localhost:${this.serverPort}`);
+    }
   },
 
   methods: {
-    ...mapActions(['toggleServerLoaded', 'setServerStatus']),
+    ...mapActions(['setServerStatus']),
   },
 };
 </script>

@@ -11,7 +11,7 @@ export default new Vuex.Store({
     users: [],
   },
   mutations: {
-    TOGGLE_SERVER_LOADED(state) {
+    SET_SERVER_LOADED(state) {
       state.serverLoaded = !state.serverLoaded;
     },
     SET_SERVER_STATUS(state, status) {
@@ -25,13 +25,13 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    toggleServerLoaded({ commit }) {
-      commit('TOGGLE_SERVER_LOADED');
+    server_loaded({ commit }, payload) {
+      commit('SET_SERVER_LOADED', payload);
     },
     setServerStatus({ commit }, status) {
       commit('SET_SERVER_STATUS', status);
     },
-    setServerPort({ commit }, port) {
+    server_port({ commit }, port) {
       commit('SET_SERVER_PORT', port);
     },
     setUsers({ commit }, list) {
