@@ -73,7 +73,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(())
         }
         "server" => {
+            let profile = args
+                .opt_value_from_str("--profile")?
+                .unwrap_or("debug".to_string());
+            let (go_server_path, admin_core_path) = configure_paths(&profile);
             compile_go_server().await?;
+            move_file(go_server_path, admin_core_path).await?;
             Ok(())
         }
         _ => {

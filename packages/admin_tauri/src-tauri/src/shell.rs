@@ -29,14 +29,10 @@ pub fn pidof(process_name: &str) -> Result<u16, ParseIntError> {
         process_name
     );
 
-    let pid = match cmd!("powershell", "-c", script)
+    let pid = cmd!("powershell", "-c", script)
         .read()
         .unwrap()
-        .parse::<u16>()
-    {
-        Ok(pid) => pid,
-        Err(e) => e,
-    };
+        .parse::<u16>()?;
 
     Ok(pid)
 }

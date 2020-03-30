@@ -30,6 +30,7 @@ export default {
   beforeCreate() {
     window.tauri.listen('state', ({ state }) => {
       const { name, payload } = state;
+      console.log(state);
       this.$store.dispatch(name, payload);
     });
   },

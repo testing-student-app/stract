@@ -13,9 +13,7 @@ extern crate serde_json;
 
 use std::env;
 use std::io::{BufRead, BufReader};
-use std::process::Command;
 
-use stract_admin::{shell, ServerReply};
 use tauri::Handle;
 
 #[derive(Serialize)]
@@ -29,23 +27,26 @@ fn main() {
     let mut first_start = true;
     tauri::AppBuilder::new()
         .setup(move |webview, _| {
+            println!("setup");
             if !setup {
                 setup = true;
                 let handle = webview.handle();
 
                 let reload_handle = webview.handle();
-                tauri::event::listen("reload".to_string(), move |port: u16| {
+                tauri::event::listen("reload".to_string(), move |port| {
+                    println!("reload");
                     first_start = false;
                     let reload_handle_clone = reload_handle.clone();
                     std::thread::spawn(move || {
                         let ten_millis = std::time::Duration::from_millis(100);
                         std::thread::sleep(ten_millis);
-                        spawn_go_server(&handle, port + 1);
+                        spawn_go_server(&reload_handle_clone, port.parse::<u16>().unwrap() + 1);
                     });
                 });
 
                 if first_start {
-                    spawn_go_server(&handle);
+                    println!("first_start");
+                    spawn_go_server(&handle, 8081);
                 }
             }
         })
@@ -57,7 +58,7 @@ fn notify_state<T: 'static>(handle: &Handle<T>, name: String) {
     notify_state_with_payload(handle, name, String::from(""))
 }
 
-fn notify_state_with_payload<T: 'static, P>(handle: &Handle<T>, name: String, payload: P) {
+fn notify_state_with_payload<T: 'static>(handle: &Handle<T>, name: String, payload: String) {
     let reply = State { name, payload };
 
     tauri::event::emit(
@@ -68,13 +69,13 @@ fn notify_state_with_payload<T: 'static, P>(handle: &Handle<T>, name: String, pa
 }
 
 fn spawn_go_server<T: 'static>(handle: &Handle<T>, port: u16) {
-    notify_state_with_payload(&handle, String::from("server_loaded"), false);
+    notify_state_with_payload(&handle, String::from("server_loaded"), false.to_string());
     let target_exe = env::current_exe().unwrap();
     let target_dir = target_exe.parent().unwrap();
     let stdout = command::spawn_command(
-        orchestrator_command(),
-        Some(target_dir),
-        vec!["-addr", format!(":{}", port)],
+        shell::go_server_execname(),
+        target_dir,
+        vec!["-addr", &format!(":{}", port)],
     )
     .expect("Failed to start go server")
     .stdout
@@ -82,27 +83,27 @@ fn spawn_go_server<T: 'static>(handle: &Handle<T>, port: u16) {
     let reader = BufReader::new(stdout);
 
     let mut webview_started = false;
-    reader
-        .lines()
-        .filter_map(|line| line.ok())
-        .for_each(|line| {
-            println!("{}", line);
-            if !line.contains("address already in use") && !webview_started {
-                webview_started = true;
-                notify_state_with_payload(&handle, String::from("server_port"), port);
-                notify_state_with_payload(&handle, String::from("server_loaded"), true);
-            } else {
-                notify_state_with_payload(&handle, String::from("server_loaded"), false);
-                startup_eval(&handle, port);
-            }
-        });
+    println!("parsing output");
+
+    let pid = shell::pidof("go-server");
+
+    if pid.is_ok() && !webview_started {
+        println!("normal");
+        webview_started = true;
+        notify_state_with_payload(&handle, String::from("server_port"), port.to_string());
+        notify_state_with_payload(&handle, String::from("server_loaded"), true.to_string());
+    } else {
+        println!("err");
+        notify_state_with_payload(&handle, String::from("server_loaded"), false.to_string());
+        startup_eval(&handle, port);
+    }
 }
 
 fn startup_eval<T: 'static>(handle: &Handle<T>, old_port: u16) {
     handle
-        .dispatch(|webview| {
+        .dispatch(move |webview| {
             webview
-                .eval(format!(
+                .eval(&format!(
                     "
       window.__STRACT_RELOAD = function () {{
         window.tauri.emit('reload', {})
@@ -111,8 +112,6 @@ fn startup_eval<T: 'static>(handle: &Handle<T>, old_port: u16) {
     ",
                     old_port
                 ))
-                .expect("failed to eval location.replace rewrite");
-            webview.eval(include_str!(concat!(env!("TAURI_DIR"), "/tauri.js")))
         })
-        .expect("failed to eval tauri entry point");
+        .unwrap();
 }
