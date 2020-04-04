@@ -1,6 +1,6 @@
 #![cfg_attr(
-all(not(debug_assertions), target_os = "windows"),
-windows_subsystem = "windows"
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
 )]
 
 mod cmd;
@@ -16,7 +16,7 @@ use std::io::{BufRead, BufReader};
 
 use tauri::Handle;
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize)]
 pub struct State {
     pub name: String,
     pub payload: String,
@@ -30,9 +30,7 @@ fn main() {
             println!("setup");
             if !setup {
                 setup = true;
-
                 let handle = webview.handle();
-                inject_tauri(&handle);
 
                 let reload_handle = webview.handle();
                 tauri::event::listen("reload".to_string(), move |port| {
@@ -42,10 +40,7 @@ fn main() {
                     std::thread::spawn(move || {
                         let ten_millis = std::time::Duration::from_millis(100);
                         std::thread::sleep(ten_millis);
-                        spawn_go_server(
-                            &reload_handle_clone,
-                            port.unwrap().parse::<u16>().unwrap() + 1,
-                        );
+                        spawn_go_server(&reload_handle_clone, port.parse::<u16>().unwrap() + 1);
                     });
                 });
 
@@ -65,12 +60,11 @@ fn notify_state<T: 'static>(handle: &Handle<T>, name: String) {
 
 fn notify_state_with_payload<T: 'static>(handle: &Handle<T>, name: String, payload: String) {
     let reply = State { name, payload };
-    println!("notified with state: {:?}", reply);
 
     tauri::event::emit(
         handle,
         String::from("state"),
-        Option::from(serde_json::to_string(&reply).unwrap()),
+        serde_json::to_string(&reply).unwrap(),
     );
 }
 
@@ -83,9 +77,9 @@ fn spawn_go_server<T: 'static>(handle: &Handle<T>, port: u16) {
         target_dir,
         vec!["-addr", &format!(":{}", port)],
     )
-        .expect("Failed to start go server")
-        .stdout
-        .expect("Failed to get go server stdout");
+    .expect("Failed to start go server")
+    .stdout
+    .expect("Failed to get go server stdout");
     let reader = BufReader::new(stdout);
 
     let mut webview_started = false;
@@ -119,13 +113,5 @@ fn startup_eval<T: 'static>(handle: &Handle<T>, old_port: u16) {
                     old_port
                 ))
         })
-        .expect("failed to inject reload");
-}
-
-fn inject_tauri<T: 'static>(handle: &Handle<T>) {
-    handle
-        .dispatch(move |webview| {
-            webview.eval(include_str!(concat!(env!("TAURI_DIR"), "/tauri.js")))
-        })
-        .expect("failed to inject tauri.js");
+        .unwrap();
 }

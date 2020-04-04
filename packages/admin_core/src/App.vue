@@ -27,21 +27,19 @@ export default {
     }),
   },
 
-  watch: {
-    serverLoaded(val) {
-      if (val) {
-        this.setServerStatus('started');
-        this.$ws.connect(`ws://localhost:${this.serverPort}`);
-      }
-    },
-  },
-
-  mounted() {
+  beforeCreate() {
     window.tauri.listen('state', ({ state }) => {
       const { name, payload } = state;
       console.log(state);
       this.$store.dispatch(name, payload);
     });
+  },
+
+  created() {
+    if (this.serverLoaded) {
+      this.setServerStatus('started');
+      this.$ws.connect(`ws://localhost:${this.serverPort}`);
+    }
   },
 
   methods: {
