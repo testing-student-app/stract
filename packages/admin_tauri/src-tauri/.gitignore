@@ -12,3 +12,4 @@ Cargo.lock
 tauri.js
 config.json
 bundle.json
+.idea

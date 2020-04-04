@@ -50,6 +50,6 @@ pub fn kill(pid: u16) -> io::Result<()> {
         "-c",
         format!("Stop-Process -ID {} -Force", pid.to_string())
     )
-    .run()?;
+        .run()?;
     Ok(())
 }
