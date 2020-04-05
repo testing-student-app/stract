@@ -1,10 +1,18 @@
 <template>
   <b-navbar variant="dark">
     <b-navbar-brand>
-      <b-badge v-if="serverStatus === 'connected'" class="text-wrap">
-        Not connected, server running
+      <b-badge
+        v-if="serverStatus === 'connected'"
+        variant="success"
+        class="text-wrap"
+      >
+        Connected, server running
       </b-badge>
-      <b-badge v-if="serverStatus === 'started'" class="text-wrap">
+      <b-badge
+        v-else-if="serverStatus === 'started'"
+        variant="warning"
+        class="text-wrap"
+      >
         Not connected, server running
       </b-badge>
       <b-badge v-else variant="danger" class="text-wrap">

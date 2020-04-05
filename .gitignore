@@ -58,6 +58,7 @@ typings/
 .idea
 debug.log
 package-lock.json
+yarn.lock
 .vscode/settings.json
 */.vscode/
 proptest-regressions/

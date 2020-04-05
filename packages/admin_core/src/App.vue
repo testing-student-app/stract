@@ -1,5 +1,5 @@
 <template>
-  <b-overlay :show="serverLoaded" rounded="sm" class="h-100">
+  <b-overlay :show="serverLoaded === 'true'" rounded="sm" class="h-100">
     <nav-bar />
 
     <b-container fluid class="main py-3">
@@ -10,6 +10,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import tauri from 'tauri/api';
 
 import NavBar from './components/NavBar.vue';
 
@@ -27,19 +28,23 @@ export default {
     }),
   },
 
-  beforeCreate() {
-    window.tauri.listen('state', ({ state }) => {
-      const { name, payload } = state;
-      console.log(state);
-      this.$store.dispatch(name, payload);
-    });
+  watch: {
+    serverLoaded: {
+      handler(val) {
+        if (val) {
+          this.setServerStatus('started');
+          this.$ws.connect(`ws://127.0.0.1:${this.serverPort}/ws/a`);
+        }
+      },
+      immediate: true,
+    },
   },
 
-  created() {
-    if (this.serverLoaded) {
-      this.setServerStatus('started');
-      this.$ws.connect(`ws://localhost:${this.serverPort}`);
-    }
+  beforeCreate() {
+    tauri.listen('state', ({ payload: state }) => {
+      const { name, payload } = state;
+      this.$store.dispatch(name, payload);
+    });
   },
 
   methods: {
