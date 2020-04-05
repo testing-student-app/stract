@@ -36,7 +36,7 @@ func (h *Hub) run() {
 		select {
 		case client := <-h.register:
 			if !client.admin {
-				h.clients[client] = client.conn.LocalAddr().String()
+				h.clients[client] = client.conn.RemoteAddr().String()
 				h.handler.InternalEmit("clientlist", client, nil)
 			} else {
 				h.admin = client
