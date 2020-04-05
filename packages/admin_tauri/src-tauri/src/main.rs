@@ -27,14 +27,12 @@ fn main() {
     let mut first_start = true;
     tauri::AppBuilder::new()
         .setup(move |webview, _| {
-            println!("setup");
             if !setup {
                 setup = true;
                 let handle = webview.handle();
 
                 let reload_handle = webview.handle();
                 tauri::event::listen("reload".to_string(), move |port| {
-                    println!("reload");
                     first_start = false;
                     let reload_handle_clone = reload_handle.clone();
                     std::thread::spawn(move || {
@@ -45,7 +43,6 @@ fn main() {
                 });
 
                 if first_start {
-                    println!("first_start");
                     spawn_go_server(&handle, 8081);
                 }
             }
@@ -83,17 +80,14 @@ fn spawn_go_server<T: 'static>(handle: &Handle<T>, port: u16) {
     let reader = BufReader::new(stdout);
 
     let mut webview_started = false;
-    println!("parsing output");
 
     let pid = shell::pidof("go-server");
 
     if pid.is_ok() && !webview_started {
-        println!("normal");
         webview_started = true;
         notify_state_with_payload(&handle, String::from("server_port"), port.to_string());
         notify_state_with_payload(&handle, String::from("server_loaded"), true.to_string());
     } else {
-        println!("err");
         notify_state_with_payload(&handle, String::from("server_loaded"), false.to_string());
         startup_eval(&handle, port);
     }

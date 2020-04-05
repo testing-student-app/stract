@@ -26,14 +26,12 @@ export default new Vuex.Store({
   },
   actions: {
     server_loaded({ commit }, payload) {
-      console.log('actions', 'server_loaded', payload);
       commit('SET_SERVER_LOADED', payload);
     },
     setServerStatus({ commit }, status) {
       commit('SET_SERVER_STATUS', status);
     },
     server_port({ commit }, port) {
-      console.log('actions', 'server_port', port);
       commit('SET_SERVER_PORT', port);
     },
     setUsers({ commit }, list) {
