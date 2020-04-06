@@ -1,11 +1,11 @@
 <template>
-  <b-overlay :show="serverLoaded === 'true'" rounded="sm" class="h-100">
+  <div>
     <nav-bar />
 
     <b-container fluid class="main py-3">
       <router-view></router-view>
     </b-container>
-  </b-overlay>
+  </div>
 </template>
 
 <script>
