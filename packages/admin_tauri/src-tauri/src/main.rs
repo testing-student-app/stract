@@ -68,7 +68,8 @@ fn main() {
                 setup = true;
 
                 let handle = webview.handle();
-                inject_tauri(&handle);
+
+                if cfg!(debug_assertions) { inject_tauri(&handle); }
 
                 let reload_handle = webview.handle();
                 tauri::event::listen("reload".to_string(), move |port| {
@@ -108,19 +109,16 @@ fn spawn_go_server<T: 'static>(handle: &Handle<T>, port: u16) {
     notify_state_with_payload(&handle, String::from("server_loaded"), false.to_string());
     let target_exe = env::current_exe().unwrap();
     let target_dir = target_exe.parent().unwrap();
-    let stdout = command::spawn_command(
+    let process = command::spawn_command(
         shell::go_server_execname(),
         target_dir,
         vec!["-addr", &format!(":{}", port)],
-    )
-        .expect("Failed to start go server")
-        .stdout
-        .expect("Failed to get go server stdout");
+    );
 
     let mut webview_started = false;
 
     let pid = shell::pidof("go-server");
-    if pid.is_ok() && !webview_started {
+    if process.is_ok() && pid.is_ok() && !webview_started {
         webview_started = true;
         tauri::close_splashscreen(&handle).unwrap();
         notify_state_with_payload(&handle, String::from("server_port"), port.to_string());
