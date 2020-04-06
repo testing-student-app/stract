@@ -3,3 +3,8 @@
 members = [
     "xtask",
 ]
+
+exclude = [
+  "packages/admin_core/src-tauri",
+  "packages/admin_tauri/src-tauri"
+]

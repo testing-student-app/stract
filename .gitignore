@@ -58,6 +58,7 @@ typings/
 .idea
 debug.log
 package-lock.json
+yarn.lock
 .vscode/settings.json
 */.vscode/
 proptest-regressions/
@@ -74,3 +75,11 @@ target
 Cargo.lock
 
 WixTools/
+packages/go-server/go-server
+packages/go-server/go-server.exe
+
+/bin
+/pkg
+
+packages/admin_core/src-tauri
+packages/go-server/stract.exe
