@@ -1,6 +1,6 @@
 #![cfg_attr(
-all(not(debug_assertions), target_os = "windows"),
-windows_subsystem = "windows"
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
 )]
 
 mod cmd;
@@ -23,7 +23,8 @@ pub struct State {
 fn main() {
     let mut setup = false;
     tauri::AppBuilder::new()
-        .splashscreen_html("
+        .splashscreen_html(
+            "
             <body>
                 <div class='text-center'>
                     <div class='spinner-border'></div>
@@ -62,7 +63,8 @@ fn main() {
                     }
                 </style>
             </body>
-        ")
+        ",
+        )
         .setup(move |webview, _| {
             if !setup {
                 setup = true;
@@ -117,8 +119,8 @@ fn spawn_go_server<T: 'static>(handle: &Handle<T>, port: u16) {
 
     let mut webview_started = false;
 
-    let pid = shell::pidof("go-server");
-    if process.is_ok() && pid.is_ok() && !webview_started {
+    // let pid = shell::pidof("go-server");
+    if process.is_ok() && /*pid.is_ok() &&*/ !webview_started {
         webview_started = true;
         tauri::close_splashscreen(&handle).unwrap();
         notify_state_with_payload(&handle, String::from("server_port"), port.to_string());
