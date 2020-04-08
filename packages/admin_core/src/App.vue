@@ -61,5 +61,6 @@ body {
 
 .main {
   height: calc(100% - 56px);
+  position: absolute;
 }
 </style>
