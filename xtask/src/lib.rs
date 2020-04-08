@@ -14,7 +14,7 @@ pub fn project_root() -> PathBuf {
     .to_path_buf()
 }
 
-pub async fn move_file(source: PathBuf, target: PathBuf) -> std::io::Result<()> {
+pub async fn move_file(source: &PathBuf, target: &PathBuf) -> std::io::Result<()> {
     // mess
     if !target.parent().unwrap().exists() {
         // check for 'target' folder to exist
@@ -103,6 +103,18 @@ pub fn create_npm_process() -> tokio::process::Command {
 pub fn create_npm_process() -> tokio::process::Command {
     let mut cmd = tokio::process::Command::new("powershell");
     cmd.arg("-c").arg("npm");
+    cmd
+}
+
+#[cfg(target_os = "linux")]
+pub fn create_tauri_process() -> tokio::process::Command {
+    tokio::process::Command::new("tauri")
+}
+
+#[cfg(target_os = "windows")]
+pub fn create_tauri_process() -> tokio::process::Command {
+    let mut cmd = tokio::process::Command::new("powershell");
+    cmd.arg("-c").arg("tauri");
     cmd
 }
 

@@ -148,7 +148,7 @@ export default {
   thead {
     th {
       position: sticky;
-      top: 1px;
+      top: 0px;
       background: #ffffff;
       z-index: 2;
     }

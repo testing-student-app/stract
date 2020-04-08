@@ -1,6 +1,6 @@
 [package]
 name = "stract_admin"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Tauri App"
 author = [
   "Andrii Shafar <andreyshafar@gmail.com>",
@@ -23,9 +23,9 @@ icon = [
 ]
 
 [dependencies]
-duct = "0.13.3"
 serde_json = "1.0.51"
 serde_derive = "1.0.106"
+netstat = "0.7.0"
 serde = { version = "1.0.106", features = [ "derive" ] }
 tauri = { version = "0.5.0", features = [ "all-api", "edge" ] }
 
