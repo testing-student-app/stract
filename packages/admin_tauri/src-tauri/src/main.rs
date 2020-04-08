@@ -114,7 +114,7 @@ fn spawn_go_server<T: 'static>(handle: &Handle<T>, port: u16) {
     let target_exe = env::current_exe().unwrap();
     let target_dir = target_exe.parent().unwrap();
     command::spawn_command(
-        shell::go_server_execname(),
+        String::from("./go-server"),
         target_dir,
         vec!["-addr", &format!(":{}", port)],
     )
