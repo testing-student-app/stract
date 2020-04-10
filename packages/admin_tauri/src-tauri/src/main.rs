@@ -5,6 +5,7 @@
 
 mod cmd;
 mod command;
+mod notify;
 
 #[macro_use]
 extern crate serde_derive;
@@ -12,24 +13,7 @@ extern crate netstat;
 extern crate serde_json;
 
 use std::env;
-
 use tauri::Handle;
-
-#[derive(Serialize)]
-pub struct State {
-    pub name: String,
-    pub payload: String,
-}
-
-#[cfg(target_os = "linux")]
-pub fn go_server_execname() -> String {
-    String::from("./go-server")
-}
-
-#[cfg(target_os = "windows")]
-pub fn go_server_execname() -> String {
-    String::from("go-server.exe")
-}
 
 fn main() {
     let mut setup = false;
@@ -66,20 +50,6 @@ fn main() {
         .run();
 }
 
-fn notify_state<T: 'static>(handle: &Handle<T>, name: String) {
-    notify_state_with_payload(handle, name, String::from(""))
-}
-
-fn notify_state_with_payload<T: 'static>(handle: &Handle<T>, name: String, payload: String) {
-    let reply = State { name, payload };
-
-    tauri::event::emit(
-        handle,
-        String::from("state"),
-        Option::from(serde_json::to_string(&reply).unwrap()),
-    );
-}
-
 fn check_if_port_exist(port: &u16) -> bool {
     let af_flags = netstat::AddressFamilyFlags::IPV4;
     let proto_flags = netstat::ProtocolFlags::TCP;
@@ -108,13 +78,32 @@ fn check_if_port_exist(port: &u16) -> bool {
     is_running
 }
 
+#[cfg(target_os = "linux")]
+fn go_server_execname() -> String {
+    String::from("./go-server")
+}
+
+#[cfg(target_os = "windows")]
+fn go_server_execname() -> String {
+    String::from("go-server.exe")
+}
+
+fn notify_server<T: 'static>(handle: &Handle<T>, port: u16, is_loaded: bool) {
+    notify::notify_state_with_payload(&handle, String::from("server_port"), port.to_string());
+    notify::notify_state_with_payload(
+        &handle,
+        String::from("server_loaded"),
+        is_loaded.to_string(),
+    );
+}
+
 fn spawn_go_server<T: 'static>(handle: &Handle<T>, port: u16) {
-    notify_state_with_payload(&handle, String::from("server_loaded"), false.to_string());
+    notify_server(&handle, port, false);
 
     let target_exe = env::current_exe().unwrap();
     let target_dir = target_exe.parent().unwrap();
     command::spawn_command(
-        String::from("./go-server"),
+        go_server_execname(),
         target_dir,
         vec!["-addr", &format!(":{}", port)],
     )
@@ -127,10 +116,9 @@ fn spawn_go_server<T: 'static>(handle: &Handle<T>, port: u16) {
 
     if is_running && !webview_started {
         webview_started = true;
-        notify_state_with_payload(&handle, String::from("server_port"), port.to_string());
-        notify_state_with_payload(&handle, String::from("server_loaded"), true.to_string());
+        notify_server(&handle, port, true);
     } else {
-        notify_state_with_payload(&handle, String::from("server_loaded"), false.to_string());
+        notify_server(&handle, port, false);
         startup_eval(&handle, port);
     }
 }
