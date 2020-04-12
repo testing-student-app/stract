@@ -9,7 +9,7 @@
             <template v-slot:button-content>
               File
             </template>
-            <b-dropdown-item>New</b-dropdown-item>
+            <b-dropdown-item @click="newFile">New</b-dropdown-item>
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item>Open File...</b-dropdown-item>
             <b-dropdown-divider></b-dropdown-divider>
@@ -44,6 +44,8 @@
 </template>
 
 <script>
+import tauri from 'tauri/api';
+
 export default {
   name: 'TestList',
 
@@ -64,81 +66,27 @@ export default {
         },
         'actions',
       ],
-      items: [
-        {
-          question: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.',
-          several_answers: false,
-          answers: [
-            {
-              text: '1) 123',
-              right: false,
-            },
-            {
-              text: '1) 1234',
-              right: false,
-            },
-            {
-              text: '1) 1235',
-              right: true,
-            },
-            {
-              text: '1) 1236',
-              right: false,
-            },
-          ],
-        },
-        {
-          question: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.',
-          several_answers: false,
-          answers: [],
-        },
-        {
-          question: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.',
-          several_answers: true,
-          answers: [],
-        },
-        {
-          question: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.',
-          several_answers: false,
-          answers: [],
-        },
-        {
-          question: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.',
-          several_answers: false,
-          answers: [],
-        },
-        {
-          question: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.',
-          several_answers: false,
-          answers: [],
-        },
-        {
-          question: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.',
-          several_answers: false,
-          answers: [],
-        },
-        {
-          question: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.',
-          several_answers: false,
-          answers: [],
-        },
-        {
-          question: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.',
-          several_answers: false,
-          answers: [],
-        },
-        {
-          question: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.',
-          several_answers: false,
-          answers: [],
-        },
-        {
-          question: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.',
-          several_answers: false,
-          answers: [],
-        },
-      ],
+      items: [],
     };
+  },
+
+  methods: {
+    newFile() {
+      tauri
+        .promisified({
+          cmd: 'newFile',
+        })
+        .then(({ payload }) => {
+          this.items = payload;
+        })
+        .catch(({ payload }) => {
+          this.$bvToast.toast(payload, {
+            title: 'Error!',
+            variant: 'danger',
+            solid: true,
+          });
+        });
+    },
   },
 };
 </script>

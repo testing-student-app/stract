@@ -13,7 +13,9 @@ extern crate netstat;
 extern crate serde_json;
 
 use std::env;
+use std::fs;
 use tauri::Handle;
+use toml::Value;
 
 fn main() {
     let mut setup = false;
@@ -44,6 +46,43 @@ fn main() {
 
                 spawn_go_server(&handle, 8081);
                 tauri::close_splashscreen(&handle).unwrap();
+            }
+        })
+        .invoke_handler(|_webview, arg| {
+            use cmd::Cmd::*;
+            match serde_json::from_str(arg) {
+                Err(e) => Err(e.to_string()),
+                Ok(command) => match command {
+                    NewFile { callback, error } => Ok(tauri::execute_promise(
+                        _webview,
+                        move || {
+                            let response: tauri::api::dialog::Response =
+                                tauri::api::dialog::select(None, None).unwrap();
+
+                            let file_path: String = match response {
+                                tauri::api::dialog::Response::Okay(file_path) => file_path,
+                                tauri::api::dialog::Response::OkayMultiple(file_paths) => {
+                                    file_paths[0].clone()
+                                }
+                                tauri::api::dialog::Response::Cancel => {
+                                    return Err("Canceled".into())
+                                }
+                            };
+
+                            let file = fs::read_to_string(file_path)
+                                .expect("Something went wrong reading the file");
+
+                            let data = file.parse::<Value>().unwrap();
+
+                            Ok(serde_json::to_string(&data).unwrap())
+                        },
+                        callback,
+                        error,
+                    )),
+                    OpenFile {} => Ok(()),
+                    Save { data } => Ok(()),
+                    SaveAs { data } => Ok(()),
+                },
             }
         })
         .build()
