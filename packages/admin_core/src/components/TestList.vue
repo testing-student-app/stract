@@ -44,8 +44,6 @@
 </template>
 
 <script>
-import tauri from 'tauri/api';
-
 export default {
   name: 'TestList',
 
@@ -72,7 +70,7 @@ export default {
 
   methods: {
     newFile() {
-      tauri
+      window.tauri
         .promisified({
           cmd: 'newFile',
         })

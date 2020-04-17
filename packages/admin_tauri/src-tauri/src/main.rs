@@ -27,10 +27,6 @@ fn main() {
 
                 let handle = webview.handle();
 
-                if cfg!(debug_assertions) {
-                    inject_tauri(&handle);
-                }
-
                 let reload_handle = webview.handle();
                 tauri::event::listen("reload".to_string(), move |port| {
                     let reload_handle_clone = reload_handle.clone();
@@ -50,35 +46,43 @@ fn main() {
         })
         .invoke_handler(|_webview, arg| {
             use cmd::Cmd::*;
+            println!(
+                "command -> {:?}",
+                serde_json::from_str::<cmd::Cmd>(arg).unwrap()
+            );
             match serde_json::from_str(arg) {
                 Err(e) => Err(e.to_string()),
                 Ok(command) => match command {
-                    NewFile { callback, error } => Ok(tauri::execute_promise(
-                        _webview,
-                        move || {
-                            let response: tauri::api::dialog::Response =
-                                tauri::api::dialog::select(None, None).unwrap();
+                    NewFile { callback, error } => {
+                        println!("executing promise NewFile");
+                        tauri::execute_promise(
+                            _webview,
+                            move || {
+                                let response: tauri::api::dialog::Response =
+                                    tauri::api::dialog::select(None, None).unwrap();
 
-                            let file_path: String = match response {
-                                tauri::api::dialog::Response::Okay(file_path) => file_path,
-                                tauri::api::dialog::Response::OkayMultiple(file_paths) => {
-                                    file_paths[0].clone()
-                                }
-                                tauri::api::dialog::Response::Cancel => {
-                                    return Err("Canceled".into())
-                                }
-                            };
+                                let file_path: String = match response {
+                                    tauri::api::dialog::Response::Okay(file_path) => file_path,
+                                    tauri::api::dialog::Response::OkayMultiple(file_paths) => {
+                                        file_paths[0].clone()
+                                    }
+                                    tauri::api::dialog::Response::Cancel => {
+                                        return Err("Canceled".into())
+                                    }
+                                };
 
-                            let file = fs::read_to_string(file_path)
-                                .expect("Something went wrong reading the file");
+                                let file = fs::read_to_string(file_path)
+                                    .expect("Something went wrong reading the file");
 
-                            let data = file.parse::<Value>().unwrap();
+                                let data = file.parse::<Value>().unwrap();
 
-                            Ok(serde_json::to_string(&data).unwrap())
-                        },
-                        callback,
-                        error,
-                    )),
+                                Ok(serde_json::to_string(&data).unwrap())
+                            },
+                            callback,
+                            error,
+                        );
+                        Ok(())
+                    }
                     OpenFile {} => Ok(()),
                     Save { data } => Ok(()),
                     SaveAs { data } => Ok(()),
@@ -171,14 +175,6 @@ fn startup_eval<T: 'static>(handle: &Handle<T>, old_port: u16) {
     handle
         .dispatch(move |webview| webview.eval("window.location.reload()"))
         .expect("failed to inject reload");
-}
-
-fn inject_tauri<T: 'static>(handle: &Handle<T>) {
-    handle
-        .dispatch(move |webview| {
-            webview.eval(include_str!(concat!(env!("TAURI_DIR"), "/tauri.js")))
-        })
-        .expect("failed to inject tauri.js");
 }
 
 const SPLASHSCREEN_HTML: &str = "

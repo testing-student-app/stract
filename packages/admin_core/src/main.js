@@ -15,6 +15,10 @@ Vue.use(WebSocketPlugin, { store });
 
 Vue.config.productionTip = false;
 
+if (process.env.NODE_ENV !== 'production' && !window.tauri) {
+  require('../../admin_tauri/src-tauri/tauri.js');
+}
+
 new Vue({
   router,
   store,

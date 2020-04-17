@@ -8,7 +8,7 @@ use xtask::{
     create_tauri_process, move_file, remove_symlinks,
 };
 
-async fn serve(matches: &ArgMatches<'_>) -> Result<(), Box<dyn std::error::Error>> {
+async fn dev(matches: &ArgMatches<'_>) -> Result<(), Box<dyn std::error::Error>> {
     let (go_server_path, admin_core_path) = configure_paths("debug");
 
     if matches.is_present("admin-core") {
@@ -124,23 +124,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .author(author)
         .about("Build system")
         .subcommand(
-            SubCommand::with_name("serve")
-                .about("serves")
+            SubCommand::with_name("dev")
+                .about("de")
                 .version(crate_version!())
                 .author(author)
                 .args(&common_args),
         )
         .subcommand(
             SubCommand::with_name("build")
-                .about("builds")
+                .about("build")
                 .version(crate_version!())
                 .author(author)
                 .args(&common_args),
         )
         .get_matches();
 
-    if let Some(matches) = matches.subcommand_matches("serve") {
-        serve(matches).await?;
+    if let Some(matches) = matches.subcommand_matches("dev") {
+        dev(matches).await?;
     } else if let Some(matches) = matches.subcommand_matches("build") {
         build(matches).await?;
     }

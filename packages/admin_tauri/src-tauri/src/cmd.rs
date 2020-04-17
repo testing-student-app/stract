@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 #[serde(tag = "cmd", rename_all = "camelCase")]
 pub enum Cmd {
     NewFile { callback: String, error: String },
