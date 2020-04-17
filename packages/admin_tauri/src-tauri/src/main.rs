@@ -46,20 +46,20 @@ fn main() {
         })
         .invoke_handler(|_webview, arg| {
             use cmd::Cmd::*;
-            println!(
-                "command -> {:?}",
-                serde_json::from_str::<cmd::Cmd>(arg).unwrap()
-            );
             match serde_json::from_str(arg) {
                 Err(e) => Err(e.to_string()),
                 Ok(command) => match command {
-                    NewFile { callback, error } => {
-                        println!("executing promise NewFile");
+                    NewFile {} => Ok(()),
+                    OpenFile { callback, error } => {
                         tauri::execute_promise(
                             _webview,
                             move || {
                                 let response: tauri::api::dialog::Response =
-                                    tauri::api::dialog::select(None, None).unwrap();
+                                    if let Ok(response) = tauri::api::dialog::select(None, None) {
+                                        response
+                                    } else {
+                                        return Err("Canceled".into());
+                                    };
 
                                 let file_path: String = match response {
                                     tauri::api::dialog::Response::Okay(file_path) => file_path,
@@ -83,7 +83,6 @@ fn main() {
                         );
                         Ok(())
                     }
-                    OpenFile {} => Ok(()),
                     Save { data } => Ok(()),
                     SaveAs { data } => Ok(()),
                 },

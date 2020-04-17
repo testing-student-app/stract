@@ -1,5 +1,3 @@
-// import tauri from 'tauri/api';
-
 const WebSocketPlugin = ({ store }) => {
   /** @type {WebSocket} */
   let socket = null;

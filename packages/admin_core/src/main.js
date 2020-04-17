@@ -5,11 +5,11 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 
-import './plugins/bootstrap';
+import './plugins/bootstrap.js';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
-import WebSocketPlugin from './plugins/websocket';
+import WebSocketPlugin from './plugins/websocket.js';
 
 Vue.use(WebSocketPlugin, { store });
 

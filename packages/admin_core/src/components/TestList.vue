@@ -9,9 +9,11 @@
             <template v-slot:button-content>
               File
             </template>
-            <b-dropdown-item @click="newFile">New</b-dropdown-item>
+            <b-dropdown-item>New</b-dropdown-item>
             <b-dropdown-divider></b-dropdown-divider>
-            <b-dropdown-item>Open File...</b-dropdown-item>
+            <b-dropdown-item @click="openFileLocal"
+              >Open File...</b-dropdown-item
+            >
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item>Save</b-dropdown-item>
             <b-dropdown-item>Save As...</b-dropdown-item>
@@ -21,7 +23,7 @@
     </b-row>
     <b-row class="h-100 overflow-auto">
       <b-col class="pt-2">
-        <b-table class="tests-table" :fields="fields" :items="items">
+        <b-table class="tests-table" :fields="fields" :items="tests">
           <template v-slot:cell(answers)="row">
             <span>{{ row.item.answers.length }}</span>
           </template>
@@ -44,6 +46,8 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex';
+
 export default {
   name: 'TestList',
 
@@ -64,26 +68,23 @@ export default {
         },
         'actions',
       ],
-      items: [],
     };
   },
-
+  computed: {
+    ...mapState({
+      tests: state => state.tests.testsTomlData,
+    }),
+  },
   methods: {
-    newFile() {
-      window.tauri
-        .promisified({
-          cmd: 'newFile',
-        })
-        .then(({ payload }) => {
-          this.items = payload;
-        })
-        .catch(({ payload }) => {
-          this.$bvToast.toast(payload, {
-            title: 'Error!',
-            variant: 'danger',
-            solid: true,
-          });
+    ...mapActions(['openFile']),
+    openFileLocal() {
+      this.openFile().catch(errorMessage => {
+        this.$bvToast.toast(errorMessage, {
+          title: 'Error!',
+          variant: 'danger',
+          solid: true,
         });
+      });
     },
   },
 };
