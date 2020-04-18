@@ -1,13 +1,13 @@
 <template>
-  <b-row class="h-100">
-    <b-col cols="4" class="h-100 overflow-auto border-right">
-      <h3 class="font-weight-bold">Connected Users</h3>
+  <div class="wrapper">
+    <div class="grid-users border-right">
+      <h3 class="p-3 font-weight-bold">Connected Users</h3>
       <user-list />
-    </b-col>
-    <b-col cols="8" class="h-100">
+    </div>
+    <div class="grid-content">
       <test-list />
-    </b-col>
-  </b-row>
+    </div>
+  </div>
 </template>
 
 <script>

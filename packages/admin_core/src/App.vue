@@ -1,10 +1,7 @@
 <template>
-  <div>
+  <div class="wrapper">
     <nav-bar />
-
-    <b-container fluid class="main py-3">
-      <router-view></router-view>
-    </b-container>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -54,13 +51,34 @@ export default {
 </script>
 
 <style lang="scss">
-html,
-body {
-  height: 100%;
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
-.main {
-  height: calc(100% - 56px);
-  position: absolute;
+.grid-header {
+  grid-area: header;
+}
+
+.grid-content {
+  grid-area: content;
+  overflow-y: auto;
+}
+
+.grid-users {
+  grid-area: users;
+}
+
+.wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: max-content;
+  grid-template-areas:
+    'header header'
+    'users  content';
+  overflow: hidden;
 }
 </style>

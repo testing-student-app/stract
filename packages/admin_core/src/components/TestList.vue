@@ -1,27 +1,6 @@
 <template>
   <div class="d-flex flex-column h-100">
-    <b-row>
-      <b-col class="border-bottom py-1">
-        <b-button-toolbar
-          aria-label="Toolbar with button groups and dropdown menu"
-        >
-          <b-dropdown variant="light">
-            <template v-slot:button-content>
-              File
-            </template>
-            <b-dropdown-item>New</b-dropdown-item>
-            <b-dropdown-divider></b-dropdown-divider>
-            <b-dropdown-item @click="openFileLocal"
-              >Open File...</b-dropdown-item
-            >
-            <b-dropdown-divider></b-dropdown-divider>
-            <b-dropdown-item>Save</b-dropdown-item>
-            <b-dropdown-item>Save As...</b-dropdown-item>
-          </b-dropdown>
-        </b-button-toolbar>
-      </b-col>
-    </b-row>
-    <b-row class="h-100 overflow-auto">
+    <b-row class="h-100">
       <b-col class="pt-2">
         <b-table class="tests-table" :fields="fields" :items="tests">
           <template v-slot:cell(answers)="row">
@@ -46,7 +25,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: 'TestList',
@@ -74,18 +53,6 @@ export default {
     ...mapState({
       tests: state => state.tests.testsTomlData,
     }),
-  },
-  methods: {
-    ...mapActions(['openFile']),
-    openFileLocal() {
-      this.openFile().catch(errorMessage => {
-        this.$bvToast.toast(errorMessage, {
-          title: 'Error!',
-          variant: 'danger',
-          solid: true,
-        });
-      });
-    },
   },
 };
 </script>
