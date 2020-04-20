@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column h-100">
-    <b-row class="h-100">
+    <b-row class="h-100 overflow-auto">
       <b-col class="pt-2">
         <b-table class="tests-table" :fields="fields" :items="tests">
           <template v-slot:cell(answers)="row">
