@@ -1,6 +1,6 @@
 #![cfg_attr(
-    all(not(debug_assertions), target_os = "windows"),
-    windows_subsystem = "windows"
+  all(not(debug_assertions), target_os = "windows"),
+  windows_subsystem = "windows"
 )]
 
 mod cmd;
@@ -18,162 +18,156 @@ use tauri::Handle;
 use toml::Value;
 
 fn main() {
-    let mut setup = false;
-    tauri::AppBuilder::new()
-        .splashscreen_html(&SPLASHSCREEN_HTML)
-        .setup(move |webview, _| {
-            if !setup {
-                setup = true;
+  let mut setup = false;
+  tauri::AppBuilder::new()
+    .splashscreen_html(&SPLASHSCREEN_HTML)
+    .setup(move |webview, _| {
+      if !setup {
+        setup = true;
 
-                let handle = webview.handle();
+        let handle = webview.handle();
 
-                let reload_handle = webview.handle();
-                tauri::event::listen("reload".to_string(), move |port| {
-                    let reload_handle_clone = reload_handle.clone();
-                    std::thread::spawn(move || {
-                        let ten_millis = std::time::Duration::from_millis(100);
-                        std::thread::sleep(ten_millis);
-                        spawn_go_server(
-                            &reload_handle_clone,
-                            port.unwrap().parse::<u16>().unwrap() + 1,
-                        );
-                    });
-                });
+        let reload_handle = webview.handle();
+        tauri::event::listen("reload".to_string(), move |port| {
+          let reload_handle_clone = reload_handle.clone();
+          std::thread::spawn(move || {
+            let ten_millis = std::time::Duration::from_millis(100);
+            std::thread::sleep(ten_millis);
+            spawn_go_server(
+              &reload_handle_clone,
+              port.unwrap().parse::<u16>().unwrap() + 1,
+            );
+          });
+        });
 
-                spawn_go_server(&handle, 8081);
-                tauri::close_splashscreen(&handle).unwrap();
-            }
-        })
-        .invoke_handler(|_webview, arg| {
-            use cmd::Cmd::*;
-            match serde_json::from_str(arg) {
-                Err(e) => Err(e.to_string()),
-                Ok(command) => match command {
-                    NewFile {} => Ok(()),
-                    OpenFile { callback, error } => {
-                        tauri::execute_promise(
-                            _webview,
-                            move || {
-                                let response: tauri::api::dialog::Response =
-                                    if let Ok(response) = tauri::api::dialog::select(None, None) {
-                                        response
-                                    } else {
-                                        return Err("Canceled".into());
-                                    };
+        spawn_go_server(&handle, 8081);
+        tauri::close_splashscreen(&handle).unwrap();
+      }
+    })
+    .invoke_handler(|_webview, arg| {
+      use cmd::Cmd::*;
+      match serde_json::from_str(arg) {
+        Err(e) => Err(e.to_string()),
+        Ok(command) => match command {
+          NewFile {} => Ok(()),
+          OpenFile { callback, error } => {
+            tauri::execute_promise(
+              _webview,
+              move || {
+                let response: tauri::api::dialog::Response =
+                  if let Ok(response) = tauri::api::dialog::select(None, None) {
+                    response
+                  } else {
+                    return Err("Canceled".into());
+                  };
 
-                                let file_path: String = match response {
-                                    tauri::api::dialog::Response::Okay(file_path) => file_path,
-                                    tauri::api::dialog::Response::OkayMultiple(file_paths) => {
-                                        file_paths[0].clone()
-                                    }
-                                    tauri::api::dialog::Response::Cancel => {
-                                        return Err("Canceled".into())
-                                    }
-                                };
+                let file_path: String = match response {
+                  tauri::api::dialog::Response::Okay(file_path) => file_path,
+                  tauri::api::dialog::Response::OkayMultiple(file_paths) => file_paths[0].clone(),
+                  tauri::api::dialog::Response::Cancel => return Err("Canceled".into()),
+                };
 
-                                let file = fs::read_to_string(file_path)
-                                    .expect("Something went wrong reading the file");
+                let file =
+                  fs::read_to_string(file_path).expect("Something went wrong reading the file");
 
-                                let data = file.parse::<Value>().unwrap();
+                let data = file.parse::<Value>().unwrap();
 
-                                Ok(serde_json::to_string(&data).unwrap())
-                            },
-                            callback,
-                            error,
-                        );
-                        Ok(())
-                    }
-                    Save { data } => Ok(()),
-                    SaveAs { data } => Ok(()),
-                },
-            }
-        })
-        .build()
-        .run();
+                Ok(serde_json::to_string(&data).unwrap())
+              },
+              callback,
+              error,
+            );
+            Ok(())
+          }
+          Save { data } => Ok(()),
+          SaveAs { data } => Ok(()),
+        },
+      }
+    })
+    .build()
+    .run();
 }
 
 fn check_if_port_exist(port: &u16) -> bool {
-    let af_flags = netstat::AddressFamilyFlags::IPV4;
-    let proto_flags = netstat::ProtocolFlags::TCP;
-    let is_running = netstat::iterate_sockets_info(af_flags, proto_flags)
-        .unwrap()
-        .filter(
-            |socket_info: &Result<netstat::SocketInfo, netstat::Error>| {
-                let socket_info = socket_info.clone();
-                return match socket_info.unwrap().protocol_socket_info {
-                    netstat::ProtocolSocketInfo::Tcp(tcp_socket_info) => {
-                        if tcp_socket_info.local_port == *port {
-                            return true;
-                        }
-                        // ignore everything else
-                        false
-                    }
-                    netstat::ProtocolSocketInfo::Udp(_) => {
-                        // we dont care about udp
-                        false
-                    }
-                };
-            },
-        )
-        .collect::<Vec<Result<netstat::SocketInfo, netstat::Error>>>();
-    let is_running = if is_running.len() != 0 { true } else { false };
-    is_running
+  let af_flags = netstat::AddressFamilyFlags::IPV4;
+  let proto_flags = netstat::ProtocolFlags::TCP;
+  let is_running = netstat::iterate_sockets_info(af_flags, proto_flags)
+    .unwrap()
+    .filter(
+      |socket_info: &Result<netstat::SocketInfo, netstat::Error>| {
+        let socket_info = socket_info.clone();
+        return match socket_info.unwrap().protocol_socket_info {
+          netstat::ProtocolSocketInfo::Tcp(tcp_socket_info) => {
+            if tcp_socket_info.local_port == *port {
+              return true;
+            }
+            // ignore everything else
+            false
+          }
+          netstat::ProtocolSocketInfo::Udp(_) => {
+            // we dont care about udp
+            false
+          }
+        };
+      },
+    )
+    .collect::<Vec<Result<netstat::SocketInfo, netstat::Error>>>();
+  let is_running = if is_running.len() != 0 { true } else { false };
+  is_running
 }
 
 #[cfg(target_os = "linux")]
 fn go_server_execname() -> String {
-    String::from("./go-server")
+  String::from("./go-server")
 }
 
 #[cfg(target_os = "windows")]
 fn go_server_execname() -> String {
-    String::from("go-server.exe")
+  String::from("go-server.exe")
 }
 
 fn notify_server<T: 'static>(handle: &Handle<T>, port: u16, is_loaded: bool) {
-    notify::notify_state_with_payload(&handle, String::from("server_port"), port.to_string());
-    notify::notify_state_with_payload(
-        &handle,
-        String::from("server_loaded"),
-        is_loaded.to_string(),
-    );
+  notify::notify_state_with_payload(&handle, String::from("server_port"), port.to_string());
+  notify::notify_state_with_payload(
+    &handle,
+    String::from("server_loaded"),
+    is_loaded.to_string(),
+  );
 }
 
 fn spawn_go_server<T: 'static>(handle: &Handle<T>, port: u16) {
+  notify_server(&handle, port, false);
+
+  let target_exe = env::current_exe().unwrap();
+  let target_dir = target_exe.parent().unwrap();
+  command::spawn_command(
+    go_server_execname(),
+    target_dir,
+    vec!["-addr", &format!(":{}", port)],
+  )
+  .expect("Failed to start guijs server");
+
+  let duration = std::time::Duration::from_millis(1000);
+  std::thread::sleep(duration);
+  let is_running = check_if_port_exist(&port);
+  let mut webview_started = false;
+
+  if is_running && !webview_started {
+    webview_started = true;
+    notify_server(&handle, port, true);
+  } else {
     notify_server(&handle, port, false);
-
-    let target_exe = env::current_exe().unwrap();
-    let target_dir = target_exe.parent().unwrap();
-    command::spawn_command(
-        go_server_execname(),
-        target_dir,
-        vec!["-addr", &format!(":{}", port)],
-    )
-    .expect("Failed to start guijs server");
-
-    let duration = std::time::Duration::from_millis(1000);
-    std::thread::sleep(duration);
-    let is_running = check_if_port_exist(&port);
-    let mut webview_started = false;
-
-    if is_running && !webview_started {
-        webview_started = true;
-        notify_server(&handle, port, true);
-    } else {
-        notify_server(&handle, port, false);
-        startup_eval(&handle, port);
-    }
+    startup_eval(&handle, port);
+  }
 }
 
 fn startup_eval<T: 'static>(handle: &Handle<T>, old_port: u16) {
-    handle
-        .dispatch(move |webview| {
-            webview.eval(&format!("window.tauri.emit('reload', {})", old_port))
-        })
-        .expect("failed to inject reload");
-    handle
-        .dispatch(move |webview| webview.eval("window.location.reload()"))
-        .expect("failed to inject reload");
+  handle
+    .dispatch(move |webview| webview.eval(&format!("window.tauri.emit('reload', {})", old_port)))
+    .expect("failed to inject reload");
+  handle
+    .dispatch(move |webview| webview.eval("window.location.reload()"))
+    .expect("failed to inject reload");
 }
 
 const SPLASHSCREEN_HTML: &str = "
