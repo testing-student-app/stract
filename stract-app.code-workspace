@@ -6,7 +6,7 @@
     },
     {
       "name": "Admin Tauri",
-      "path": "packages/new_admin_tauri"
+      "path": "packages/new_admin_tauri/src-tauri"
     },
     {
       "name": "Go Server",
