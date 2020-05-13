@@ -3,8 +3,12 @@
     <b-row class="h-100 overflow-auto">
       <b-col class="pt-2">
         <b-table class="tests-table" :fields="fields" :items="tests">
-          <template v-slot:cell(answers)="row">
-            <span>{{ row.item.answers.length }}</span>
+          <template v-slot:cell(question)="{ item, index }">
+            <span>{{ `${index + 1} - ${item.question}` }}</span>
+          </template>
+
+          <template v-slot:cell(answers)="{ item }">
+            <span>{{ item.answers.length }}</span>
           </template>
 
           <template v-slot:cell(actions)="row">
@@ -13,10 +17,29 @@
             </b-button>
           </template>
 
-          <template v-slot:row-details="row">
-            <pre>
-              {{ `${JSON.stringify(row.item, null, 2)}` }}
-            </pre>
+          <template v-slot:row-details="{ item }">
+            <b-list-group>
+              <b-list-group-item v-for="(a, i) in item.answers" :key="i">
+                <div class="d-flex align-items-center">
+                  <b-icon
+                    font-scale="2"
+                    :icon="a.right ? 'check' : 'x'"
+                    :variant="a.right ? 'success' : 'danger'"
+                  ></b-icon>
+                  <span class="pl-2">
+                    {{ `${i + 1}) ${a.text}` }}
+                  </span>
+                </div>
+              </b-list-group-item>
+              <b-list-group-item
+                class="d-flex align-items-center justify-content-center"
+              >
+                <b-button squared block variant="light">
+                  <b-icon icon="plus"></b-icon>
+                  Add answer
+                </b-button>
+              </b-list-group-item>
+            </b-list-group>
           </template>
         </b-table>
       </b-col>
@@ -39,16 +62,13 @@ export default {
         },
         {
           key: 'answers',
-          label: 'Answers count',
-        },
-        {
-          key: 'several_answers',
-          label: 'Several Answers',
+          label: 'Total answers',
         },
         'actions',
       ],
     };
   },
+
   computed: {
     ...mapState({
       tests: state => state.tests.testsTomlData,
