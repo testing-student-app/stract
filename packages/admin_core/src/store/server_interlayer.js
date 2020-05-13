@@ -1,7 +1,8 @@
+import tauri from 'tauri/api';
+
 const state = {
   serverLoaded: 'false',
   serverStatus: '',
-  serverPort: '8081',
   users: [],
 };
 
@@ -21,14 +22,38 @@ const mutations = {
 };
 
 const actions = {
-  server_loaded({ commit }, payload) {
-    commit('SET_SERVER_LOADED', payload);
+  startServer({ commit }, port) {
+    return tauri
+      .promisified({
+        cmd: 'startServer',
+        port: port.toString(),
+      })
+      .then(data => {
+        commit('SET_SERVER_LOADED', true);
+        commit('SET_SERVER_STATUS', 'started');
+        return data;
+      })
+      .catch(() => {
+        commit('SET_SERVER_LOADED', false);
+        commit('SET_SERVER_STATUS', 'failed');
+      });
+  },
+  checkServer({ commit }, port) {
+    return tauri
+      .promisified({
+        cmd: 'checkServer',
+        port: port.toString(),
+      })
+      .then(data => {
+        commit('SET_SERVER_STATUS', 'started');
+        return data;
+      })
+      .catch(() => {
+        commit('SET_SERVER_STATUS', 'failed');
+      });
   },
   setServerStatus({ commit }, status) {
     commit('SET_SERVER_STATUS', status);
-  },
-  server_port({ commit }, port) {
-    commit('SET_SERVER_PORT', port);
   },
   setUsers({ commit }, list) {
     commit('SET_USERS', list);
