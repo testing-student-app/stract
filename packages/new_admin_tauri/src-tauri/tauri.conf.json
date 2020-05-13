@@ -12,6 +12,7 @@
     },
     "bundle": {
       "active": true,
+      "targets": "all",
       "identifier": "com.tauri.dev",
       "icon": [
         "icons/32x32.png",
@@ -27,11 +28,13 @@
       "shortDescription": "",
       "longDescription": "",
       "deb": {
-        "depends": []
+        "depends": [],
+        "useBootstrapper": false
       },
       "osx": {
         "frameworks": [],
-        "minimumSystemVersion": ""
+        "minimumSystemVersion": "",
+        "useBootstrapper": false
       },
       "exceptionDomain": ""
     },
@@ -39,7 +42,7 @@
       "all": true
     },
     "window": {
-      "title": "Tauri App",
+      "title": "Stract Admin",
       "width": 1280,
       "height": 720,
       "resizable": true,

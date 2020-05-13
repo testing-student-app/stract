@@ -23,9 +23,9 @@ async fn dev(matches: &ArgMatches<'_>) -> Result<(), Box<dyn std::error::Error>>
     } else if matches.is_present("admin-tauri") {
         create_tauri_process()
             .arg("dev")
-            .current_dir("./packages/admin_tauri")
+            .current_dir("./packages/new_admin_tauri")
             .spawn()
-            .expect("failed to dev admin_tauri")
+            .expect("failed to dev new_admin_tauri")
             .await?;
     } else if matches.is_present("go-server") {
         compile_go_server().await?;
@@ -71,9 +71,9 @@ async fn build(matches: &ArgMatches<'_>) -> Result<(), Box<dyn std::error::Error
     } else if matches.is_present("admin-tauri") {
         create_tauri_process()
             .arg("build")
-            .current_dir("./packages/admin_tauri")
+            .current_dir("./packages/new_admin_tauri")
             .spawn()
-            .expect("failed to build admin_tauri")
+            .expect("failed to build new_admin_tauri")
             .await?;
     } else if matches.is_present("go-server") {
         compile_go_server().await?;
@@ -125,7 +125,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .about("Build system")
         .subcommand(
             SubCommand::with_name("dev")
-                .about("de")
+                .about("dev")
                 .version(crate_version!())
                 .author(author)
                 .args(&common_args),

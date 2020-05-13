@@ -62,7 +62,7 @@ pub fn configure_paths(build_profile: &str) -> (PathBuf, PathBuf) {
 
     let mut admin_core_path: PathBuf = project_root();
     admin_core_path.push("packages");
-    admin_core_path.push("admin_tauri");
+    admin_core_path.push("new_admin_tauri");
     admin_core_path.push("src-tauri");
     admin_core_path.push("target");
     admin_core_path.push(build_profile);
@@ -126,7 +126,7 @@ pub fn create_symlinks() -> std::io::Result<()> {
     };
 
     symlink::symlink_dir(
-        root.join("admin_tauri").join("src-tauri/"),
+        root.join("new_admin_tauri").join("src-tauri/"),
         root.join("admin_core").join("src-tauri"),
     )?;
 

@@ -1,0 +1,15 @@
+{
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "lerna": "^3.20.2"
+  },
+  "scripts": {
+    "dev:admin-core": "cargo xtask dev --admin-core",
+    "dev:admin-tauri": "cargo xtask dev --admin-tauri",
+    "dev:go-server": "cargo xtask dev --go-server",
+    "build:admin-core": "cargo xtask build --admin-core",
+    "build:admin-tauri": "cargo xtask build --admin-tauri",
+    "build:go-server": "cargo xtask dev --go-server"
+  }
+}

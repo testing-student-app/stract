@@ -1,3 +1,5 @@
+import tauri from 'tauri/api';
+
 const state = {};
 
 const getters = {};
@@ -6,7 +8,8 @@ const mutations = {};
 
 const actions = {
   openFile({ commit }) {
-    return window.tauri
+    window.log('openfile');
+    return tauri
       .promisified({
         cmd: 'openFile',
       })

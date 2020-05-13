@@ -1,18 +1,21 @@
 const WebSocketPlugin = ({ store }) => {
   /** @type {WebSocket} */
   let socket = null;
+  const port = 8082;
 
   return {
     connect(url) {
-      socket = new WebSocket(url);
+      store.dispatch('startServer', port).then(() => {
+        socket = new WebSocket(url.replace(':port', `:${port}`));
 
-      socket.addEventListener('open', () => {
-        store.dispatch('setServerStatus', 'connected');
-      });
+        socket.addEventListener('open', () => {
+          store.dispatch('setServerStatus', 'connected');
+        });
 
-      socket.addEventListener('message', ({ data }) => {
-        const { action, payload } = JSON.parse(data);
-        store.dispatch(action, payload);
+        socket.addEventListener('message', ({ data }) => {
+          const { action, payload } = JSON.parse(data);
+          store.dispatch(action, payload);
+        });
       });
     },
 
