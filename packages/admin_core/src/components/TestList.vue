@@ -19,16 +19,32 @@
 
           <template v-slot:row-details="{ item }">
             <b-list-group>
-              <b-list-group-item v-for="(a, i) in item.answers" :key="i">
-                <div class="d-flex align-items-center">
-                  <b-icon
-                    font-scale="2"
-                    :icon="a.right ? 'check' : 'x'"
-                    :variant="a.right ? 'success' : 'danger'"
-                  ></b-icon>
-                  <span class="pl-2">
-                    {{ `${i + 1}) ${a.text}` }}
-                  </span>
+              <b-list-group-item
+                v-for="(answer, i) in item.answers"
+                :key="i"
+                class="answer-item"
+              >
+                <div class="d-flex justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <b-icon
+                      font-scale="2"
+                      :icon="answer.right ? 'check' : 'x'"
+                      :variant="answer.right ? 'success' : 'danger'"
+                    ></b-icon>
+                    <span class="pl-2">
+                      {{ `${i + 1}) ${answer.text}` }}
+                    </span>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <span class="edit-btn px-1">
+                      <b-icon icon="pencil"></b-icon>
+                      <span class="pl-1">Edit</span>
+                    </span>
+                    <span class="del-btn px-1">
+                      <b-icon icon="trash"></b-icon>
+                      <span class="pl-1">Delete</span>
+                    </span>
+                  </div>
                 </div>
               </b-list-group-item>
               <b-list-group-item
@@ -78,6 +94,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+%btn {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 ::v-deep .tests-table {
   thead {
     th {
@@ -85,6 +106,26 @@ export default {
       top: 0px;
       background: #ffffff;
       z-index: 2;
+    }
+  }
+  .answer-item {
+    &:hover {
+      transform: scale(1.005);
+      margin: 0.5px;
+      box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+    }
+    .edit-btn {
+      &:hover {
+        @extend %btn;
+        color: #ffc107;
+        text-decoration: underline;
+      }
+    }
+    .del-btn {
+      &:hover {
+        @extend %btn;
+        color: #dc3545;
+      }
     }
   }
 }
