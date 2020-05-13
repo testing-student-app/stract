@@ -2,14 +2,14 @@
   <b-navbar variant="dark">
     <b-navbar-brand>
       <b-badge
-        v-if="serverStatusLocal === 'connected'"
+        v-if="serverStatus === 'connected'"
         variant="success"
         class="text-wrap"
       >
         Connected, server running
       </b-badge>
       <b-badge
-        v-else-if="serverStatusLocal === 'started'"
+        v-else-if="serverStatus === 'started'"
         variant="warning"
         class="text-wrap"
       >
@@ -50,10 +50,6 @@ export default {
     ...mapState({
       serverStatus: state => state.serverInterlayer.serverStatus,
     }),
-    serverStatusLocal() {
-      console.log(this.serverStatus);
-      return this.serverStatus;
-    },
   },
 
   methods: {

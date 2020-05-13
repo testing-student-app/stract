@@ -5,7 +5,7 @@ const WebSocketPlugin = ({ store }) => {
 
   return {
     connect(url) {
-      store.dispatch('startServer', port).then(() => {
+      const createSocket = () => {
         socket = new WebSocket(url.replace(':port', `:${port}`));
 
         socket.addEventListener('open', () => {
@@ -16,6 +16,20 @@ const WebSocketPlugin = ({ store }) => {
           const { action, payload } = JSON.parse(data);
           store.dispatch(action, payload);
         });
+
+        socket.addEventListener('error', () => {
+          console.log('failed');
+          store.dispatch('setServerStatus', 'connected');
+        });
+      };
+      store.dispatch('startServer', port).then(({ good_ok: goodOk }) => {
+        if (goodOk) {
+          createSocket();
+        } else {
+          store.dispatch('startServer', port).then(() => {
+            createSocket();
+          });
+        }
       });
     },
 

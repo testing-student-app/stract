@@ -8,7 +8,6 @@ const mutations = {};
 
 const actions = {
   openFile({ commit }) {
-    window.log('openfile');
     return tauri
       .promisified({
         cmd: 'openFile',

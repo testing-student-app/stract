@@ -5,11 +5,13 @@
     "lerna": "^3.20.2"
   },
   "scripts": {
+    "dev": "cargo xtask dev",
     "dev:admin-core": "cargo xtask dev --admin-core",
     "dev:admin-tauri": "cargo xtask dev --admin-tauri",
-    "dev:go-server": "cargo xtask dev --go-server",
+    "dev:go-server": "cargo xtask dev --go-server --move",
+    "build": "cargo xtask build",
     "build:admin-core": "cargo xtask build --admin-core",
     "build:admin-tauri": "cargo xtask build --admin-tauri",
-    "build:go-server": "cargo xtask dev --go-server"
+    "build:go-server": "cargo xtask dev --go-server --move"
   }
 }

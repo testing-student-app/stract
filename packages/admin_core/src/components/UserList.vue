@@ -12,7 +12,7 @@ export default {
 
   computed: {
     ...mapState({
-      users: state => state.users,
+      users: state => state.serverInterlayer.users,
     }),
   },
 };
