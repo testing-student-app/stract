@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"gitlab.com/Reidond/stract/models"
 )
 
 const (
@@ -49,12 +50,6 @@ type Client struct {
 	send chan []byte
 }
 
-// WSData ...
-type WSData struct {
-	Action string      `json:"action"`
-	Paylod interface{} `json:"payload"`
-}
-
 // readPump pumps messages from the websocket connection to the hub.
 //
 // The application runs readPump in a per-connection goroutine. The application
@@ -80,7 +75,7 @@ func (c *Client) readPump() {
 
 		fmt.Printf("\nData: %s", string(message))
 
-		var d WSData
+		var d models.WSData
 
 		err2 := json.Unmarshal(message, &d)
 

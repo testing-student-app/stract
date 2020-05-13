@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
+	"gitlab.com/Reidond/stract/models"
 )
 
 // AdminHandler ...
@@ -29,7 +31,7 @@ func (ah *AdminHandler) ClientList(c *Client, p interface{}) {
 		values = append(values, value)
 	}
 
-	b, err := json.Marshal(WSData{
+	b, err := json.Marshal(models.WSData{
 		Action: "setUsers",
 		Paylod: values,
 	})
