@@ -10,8 +10,10 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 import WebSocketPlugin from './plugins/websocket.js';
+import ConfirmPlugin from './plugins/confirm.js';
 
 Vue.use(WebSocketPlugin, { store });
+Vue.use(ConfirmPlugin);
 
 Vue.config.productionTip = false;
 
