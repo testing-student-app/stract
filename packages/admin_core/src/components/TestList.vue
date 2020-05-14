@@ -25,24 +25,58 @@
                 class="answer-item"
               >
                 <div class="d-flex justify-content-between">
-                  <div class="d-flex align-items-center">
-                    <b-icon
+                  <div class="d-flex align-items-center w-75">
+                    <b-iconstack
                       font-scale="2"
-                      :icon="answer.right ? 'check' : 'x'"
-                      :variant="answer.right ? 'success' : 'danger'"
-                    ></b-icon>
-                    <span class="pl-2">
+                      class="mr-2"
+                      @click="toggleRight(i, answer)"
+                    >
+                      <b-icon
+                        v-if="fieldInEditMode[i]"
+                        stacked
+                        icon="square"
+                      ></b-icon>
+                      <b-icon
+                        stacked
+                        :icon="answer.right ? 'check' : 'x'"
+                        :variant="answer.right ? 'success' : 'danger'"
+                      ></b-icon>
+                    </b-iconstack>
+                    <span v-if="!fieldInEditMode[i]">
                       {{ `${i + 1}) ${answer.text}` }}
                     </span>
+                    <b-form-input
+                      v-if="fieldInEditMode[i]"
+                      v-model="answer.text"
+                      placeholder="Enter your answer"
+                    ></b-form-input>
                   </div>
-                  <div class="d-flex align-items-center">
-                    <span class="edit-btn px-1">
+                  <div
+                    class="d-flex align-items-center justify-content-around w-25"
+                  >
+                    <span
+                      v-if="!fieldInEditMode[i]"
+                      class="edit-btn px-1"
+                      @click="toggleEditMode(i)"
+                    >
                       <b-icon icon="pencil"></b-icon>
                       <span class="pl-1">Edit</span>
                     </span>
-                    <span class="del-btn px-1">
+                    <span
+                      v-if="fieldInEditMode[i]"
+                      class="ok-btn px-1"
+                      @click="toggleEditMode(i)"
+                    >
+                      <span class="pl-1">OK</span>
+                    </span>
+                    <span v-if="!fieldInEditMode[i]" class="del-btn px-1">
                       <b-icon icon="trash"></b-icon>
                       <span class="pl-1">Delete</span>
+                    </span>
+                    <span v-if="fieldInEditMode[i]" class="del-btn px-1">
+                      <span class="pl-1" @click="toggleEditMode(i)">
+                        Cancel
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -82,6 +116,7 @@ export default {
         },
         'actions',
       ],
+      fieldInEditMode: {},
     };
   },
 
@@ -89,6 +124,20 @@ export default {
     ...mapState({
       tests: state => state.tests.testsTomlData,
     }),
+  },
+
+  methods: {
+    toggleEditMode(id) {
+      this.fieldInEditMode = {
+        ...this.fieldInEditMode,
+        [id]: !this.fieldInEditMode[id],
+      };
+    },
+    toggleRight(id, answer) {
+      if (this.fieldInEditMode[id]) {
+        answer.right = !answer.right;
+      }
+    },
   },
 };
 </script>
@@ -113,6 +162,13 @@ export default {
       transform: scale(1.005);
       margin: 0.5px;
       box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+    }
+    .ok-btn {
+      &:hover {
+        @extend %btn;
+        color: #28a745;
+        text-decoration: underline;
+      }
     }
     .edit-btn {
       &:hover {
