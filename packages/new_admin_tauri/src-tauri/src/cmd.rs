@@ -8,16 +8,20 @@ pub struct ServerReply {
 #[derive(Deserialize)]
 #[serde(tag = "cmd", rename_all = "camelCase")]
 pub enum Cmd {
-  NewFile {},
   OpenFile {
     callback: String,
     error: String,
   },
   Save {
-    data: String,
+    callback: String,
+    error: String,
+    path: String,
+    data: toml::value::Table,
   },
   SaveAs {
-    data: String,
+    callback: String,
+    error: String,
+    data: toml::value::Table,
   },
   StartServer {
     callback: String,

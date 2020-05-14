@@ -131,7 +131,7 @@ export default {
 
   computed: {
     ...mapState({
-      tests: state => state.tests.testsTomlData,
+      tests: state => state.tests.testsTomlData.questions,
     }),
   },
 

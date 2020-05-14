@@ -28,12 +28,12 @@
           <template v-slot:button-content>
             File
           </template>
-          <b-dropdown-item>New</b-dropdown-item>
+          <b-dropdown-item @click="newFile">New</b-dropdown-item>
           <b-dropdown-divider></b-dropdown-divider>
           <b-dropdown-item @click="openFileLocal">Open File...</b-dropdown-item>
           <b-dropdown-divider></b-dropdown-divider>
-          <b-dropdown-item>Save</b-dropdown-item>
-          <b-dropdown-item>Save As...</b-dropdown-item>
+          <b-dropdown-item @click="saveFileLocal">Save</b-dropdown-item>
+          <b-dropdown-item @click="saveFileAsLocal">Save As...</b-dropdown-item>
         </b-dropdown>
       </b-button-toolbar>
     </b-navbar-nav>
@@ -53,14 +53,44 @@ export default {
   },
 
   methods: {
-    ...mapActions(['openFile']),
+    ...mapActions(['newFile', 'openFile', 'saveFile', 'saveFileAs']),
     openFileLocal() {
       this.openFile().catch(errorMessage => {
         let message;
         if (!errorMessage) {
           message = errorMessage;
         } else {
-          message = 'Something went terribly wrong';
+          message = 'Something went terribly wrong with opening file';
+        }
+        this.$bvToast.toast(message, {
+          title: 'File System Error!',
+          variant: 'danger',
+          solid: true,
+        });
+      });
+    },
+    saveFileLocal() {
+      this.saveFile().catch(errorMessage => {
+        let message;
+        if (!errorMessage) {
+          message = errorMessage;
+        } else {
+          message = 'Something went terribly wrong with saving file';
+        }
+        this.$bvToast.toast(message, {
+          title: 'File System Error!',
+          variant: 'danger',
+          solid: true,
+        });
+      });
+    },
+    saveFileAsLocal() {
+      this.saveFileAs().catch(errorMessage => {
+        let message;
+        if (!errorMessage) {
+          message = errorMessage;
+        } else {
+          message = 'Something went terribly wrong with saving file as';
         }
         this.$bvToast.toast(message, {
           title: 'File System Error!',

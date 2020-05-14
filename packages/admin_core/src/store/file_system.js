@@ -1,20 +1,77 @@
 import tauri from 'tauri/api';
+import { nanoid } from 'nanoid';
 
-const state = {};
+const state = {
+  path: '',
+};
 
 const getters = {};
 
-const mutations = {};
+const mutations = {
+  SET_PATH(state, path) {
+    state.path = path;
+  },
+};
 
 const actions = {
+  newFile({ commit }) {
+    commit('SET_PATH', '');
+    commit('SET_TESTS', {
+      questions: [
+        { id: nanoid(), question: '', several_answers: false, answers: [] },
+      ],
+    });
+  },
   openFile({ commit }) {
     return tauri
       .promisified({
         cmd: 'openFile',
       })
-      .then(tomlData => {
-        commit('SET_TESTS', tomlData?.data);
-        return tomlData;
+      .then(internalTomlFile => {
+        const { path, contents } = internalTomlFile;
+        commit('SET_PATH', path);
+        commit('SET_TESTS', contents);
+        return internalTomlFile;
+      });
+  },
+  saveFile({ state, commit, rootState }) {
+    if (state.path) {
+      return tauri
+        .promisified({
+          cmd: 'save',
+          path: state.path,
+          data: rootState.tests.testsTomlData,
+        })
+        .then(internalTomlFile => {
+          const { path, contents } = internalTomlFile;
+          commit('SET_PATH', path);
+          commit('SET_TESTS', contents);
+          return internalTomlFile;
+        });
+    }
+    return tauri
+      .promisified({
+        cmd: 'saveAs',
+        data: rootState.tests.testsTomlData,
+      })
+      .then(internalTomlFile => {
+        const { path, contents } = internalTomlFile;
+        commit('SET_PATH', path);
+        commit('SET_TESTS', contents);
+        return internalTomlFile;
+      });
+  },
+  saveFileAs({ commit, rootState }) {
+    return tauri
+      .promisified({
+        cmd: 'saveAs',
+        data: rootState.tests.testsTomlData,
+      })
+      .then(internalTomlFile => {
+        const { path, contents } = internalTomlFile;
+        commit('SET_PATH', path);
+        commit('SET_TESTS', contents);
+        return internalTomlFile;
       });
   },
 };

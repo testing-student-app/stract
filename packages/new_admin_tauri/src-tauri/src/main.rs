@@ -6,6 +6,7 @@
 mod cmd;
 mod command;
 mod notify;
+mod strict_toml;
 
 #[macro_use]
 extern crate serde_derive;
@@ -14,7 +15,9 @@ extern crate serde_json;
 
 use std::env;
 use std::fs;
-use tauri::Handle;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
 use toml::Value;
 
 fn main() {
@@ -24,17 +27,17 @@ fn main() {
       match serde_json::from_str(arg) {
         Err(e) => Err(e.to_string()),
         Ok(command) => match command {
-          NewFile {} => Ok(()),
           OpenFile { callback, error } => {
             tauri::execute_promise(
               _webview,
               move || {
-                let response: tauri::api::dialog::Response =
-                  if let Ok(response) = tauri::api::dialog::select(None, None) {
-                    response
-                  } else {
-                    return Err("Canceled".into());
-                  };
+                let response: tauri::api::dialog::Response = if let Ok(response) =
+                  tauri::api::dialog::select(Some("toml".to_string()), None)
+                {
+                  response
+                } else {
+                  return Err("Canceled".into());
+                };
 
                 let file_path: String = match response {
                   tauri::api::dialog::Response::Okay(file_path) => file_path,
@@ -42,20 +45,134 @@ fn main() {
                   tauri::api::dialog::Response::Cancel => return Err("Canceled".into()),
                 };
 
-                let file =
-                  fs::read_to_string(file_path).expect("Something went wrong reading the file");
+                let file = fs::read_to_string(file_path.clone())
+                  .expect("Something went wrong reading the file");
 
                 let data = file.parse::<Value>().unwrap();
 
-                Ok(serde_json::to_string(&data).unwrap())
+                let internal_toml_file = strict_toml::InternalTomlFile {
+                  path: file_path.clone(),
+                  contents: strict_toml::create_with_nanoids(data),
+                };
+
+                Ok(serde_json::to_string(&internal_toml_file).unwrap())
               },
               callback,
               error,
             );
             Ok(())
           }
-          Save { data } => Ok(()),
-          SaveAs { data } => Ok(()),
+          Save {
+            callback,
+            error,
+            path,
+            data,
+          } => {
+            tauri::execute_promise(
+              _webview,
+              move || {
+                let os_path = Path::new(&path);
+                let display = os_path.display();
+
+                let mut file = match File::create(&os_path) {
+                  Err(why) => return Err("Could not create file!".into()),
+                  Ok(file) => file,
+                };
+
+                match file.write_all(
+                  toml::ser::to_string_pretty(&strict_toml::remove_nanoids(toml::Value::from(
+                    data.clone(),
+                  )))
+                  .unwrap()
+                  .as_bytes(),
+                ) {
+                  Err(why) => {
+                    return Err(
+                      format!(
+                        "couldn't write to {}: {}",
+                        display,
+                        why.raw_os_error().unwrap()
+                      )
+                      .into(),
+                    )
+                  }
+                  Ok(_) => println!("successfully wrote to {}", display),
+                };
+
+                let internal_toml_file = strict_toml::InternalTomlFile {
+                  path,
+                  contents: toml::Value::from(data),
+                };
+
+                Ok(serde_json::to_string(&internal_toml_file).unwrap())
+              },
+              callback,
+              error,
+            );
+            Ok(())
+          }
+          SaveAs {
+            callback,
+            error,
+            data,
+          } => {
+            tauri::execute_promise(
+              _webview,
+              move || {
+                let response: tauri::api::dialog::Response = if let Ok(response) =
+                  tauri::api::dialog::save_file(Some("toml".to_string()), None)
+                {
+                  response
+                } else {
+                  return Err("Canceled".into());
+                };
+
+                let file_path: String = match response {
+                  tauri::api::dialog::Response::Okay(file_path) => file_path,
+                  tauri::api::dialog::Response::OkayMultiple(file_paths) => file_paths[0].clone(),
+                  tauri::api::dialog::Response::Cancel => return Err("Canceled".into()),
+                };
+
+                let os_path = Path::new(&file_path);
+                let display = os_path.display();
+
+                let mut file = match File::create(&os_path) {
+                  Err(why) => return Err("Could not create file!".into()),
+                  Ok(file) => file,
+                };
+
+                match file.write_all(
+                  toml::ser::to_string_pretty(&strict_toml::remove_nanoids(toml::Value::from(
+                    data.clone(),
+                  )))
+                  .unwrap()
+                  .as_bytes(),
+                ) {
+                  Err(why) => {
+                    return Err(
+                      format!(
+                        "couldn't write to {}: {}",
+                        display,
+                        why.raw_os_error().unwrap()
+                      )
+                      .into(),
+                    )
+                  }
+                  Ok(_) => println!("successfully wrote to {}", display),
+                };
+
+                let internal_toml_file = strict_toml::InternalTomlFile {
+                  path: file_path.clone(),
+                  contents: toml::Value::from(data),
+                };
+
+                Ok(serde_json::to_string(&internal_toml_file).unwrap())
+              },
+              callback,
+              error,
+            );
+            Ok(())
+          }
           StartServer {
             callback,
             error,
@@ -66,11 +183,11 @@ fn main() {
               move || {
                 let port = port.parse::<u16>().unwrap();
                 let good_ok = spawn_go_server(port);
-                let serverReply = cmd::ServerReply { good_ok };
+                let server_reply = cmd::ServerReply { good_ok };
                 if !good_ok {
                   return Err("failed".into());
                 }
-                Ok(serde_json::to_string(&serverReply).unwrap())
+                Ok(serde_json::to_string(&server_reply).unwrap())
               },
               callback,
               error,
@@ -87,9 +204,9 @@ fn main() {
               move || {
                 let port = port.parse::<u16>().unwrap();
                 let good_ok = check_if_port_exist(&port);
-                let serverReply = cmd::ServerReply { good_ok };
+                let server_reply = cmd::ServerReply { good_ok };
                 if good_ok {
-                  return Ok(serde_json::to_string(&serverReply).unwrap());
+                  return Ok(serde_json::to_string(&server_reply).unwrap());
                 }
                 Err("failed".into())
               },
@@ -118,7 +235,6 @@ fn spawn_go_server(port: u16) -> bool {
 
   let duration = std::time::Duration::from_millis(1000);
   std::thread::sleep(duration);
-  // let is_running = check_if_port_exist(&port);
 
   true
 }

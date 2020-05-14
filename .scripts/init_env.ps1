@@ -1,7 +1,7 @@
 Write-Output "Setting up enviromental Variables"
 # setup relative paths
 $dist_path = "packages\admin_core\dist"
-$src_path = "packages\admin_tauri\src-tauri"
+$src_path = "packages\new_admin_tauri\src-tauri"
 
 # check to see if path variables are directories
 if ((Test-Path $dist_path -PathType Any) -Or (Test-Path $src_path -PathType Any)) {
