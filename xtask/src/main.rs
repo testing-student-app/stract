@@ -4,8 +4,8 @@ use clap::{crate_version, App, Arg, ArgMatches, SubCommand};
 use tokio;
 
 use xtask::{
-    check_node_modules, compile_go_server, configure_paths, create_npm_process, create_symlinks,
-    create_tauri_process, move_file, remove_symlinks,
+    check_node_modules, compile_go_server, configure_paths, create_npm_process,
+    create_tauri_process, move_file,
 };
 
 async fn dev(matches: &ArgMatches<'_>) -> Result<(), Box<dyn std::error::Error>> {
@@ -20,6 +20,15 @@ async fn dev(matches: &ArgMatches<'_>) -> Result<(), Box<dyn std::error::Error>>
             .spawn()
             .expect("failed to serve admin_core")
             .await?;
+    } else if matches.is_present("client-core") {
+        check_node_modules("client_core").await?;
+        create_npm_process()
+            .arg("run")
+            .arg("serve")
+            .current_dir("./packages/client_core")
+            .spawn()
+            .expect("failed to serve client_core")
+            .await?;
     } else if matches.is_present("admin-tauri") {
         create_tauri_process()
             .arg("dev")
@@ -27,30 +36,40 @@ async fn dev(matches: &ArgMatches<'_>) -> Result<(), Box<dyn std::error::Error>>
             .spawn()
             .expect("failed to dev new_admin_tauri")
             .await?;
+    } else if matches.is_present("client-tauri") {
+        create_tauri_process()
+            .arg("dev")
+            .current_dir("./packages/client_tauri")
+            .spawn()
+            .expect("failed to dev client_tauri")
+            .await?;
     } else if matches.is_present("go-server") {
         compile_go_server().await?;
         if matches.is_present("move") {
             move_file(&go_server_path, &admin_core_path).await?;
         }
     } else {
+        /* This is not working cuz vue-plugin-tauri was not updated in the
+        time of this commit */
+
         // Go Server Compile
-        compile_go_server().await?;
-        move_file(&go_server_path, &admin_core_path).await?;
+        // compile_go_server().await?;
+        // move_file(&go_server_path, &admin_core_path).await?;
 
-        check_node_modules("admin_core").await?;
+        // check_node_modules("admin_core").await?;
 
-        create_symlinks()?;
+        // create_symlinks()?;
 
-        // npm run tauri:serve
-        create_npm_process()
-            .arg("run")
-            .arg("tauri:serve")
-            .current_dir("./packages/admin_core")
-            .spawn()
-            .expect("failed to serve tauri")
-            .await?;
+        // // npm run tauri:serve
+        // create_npm_process()
+        //     .arg("run")
+        //     .arg("tauri:serve")
+        //     .current_dir("./packages/admin_core")
+        //     .spawn()
+        //     .expect("failed to serve tauri")
+        //     .await?;
 
-        remove_symlinks()?;
+        // remove_symlinks()?;
     }
 
     Ok(())
@@ -68,6 +87,15 @@ async fn build(matches: &ArgMatches<'_>) -> Result<(), Box<dyn std::error::Error
             .spawn()
             .expect("failed to build admin_core")
             .await?;
+    } else if matches.is_present("client-core") {
+        check_node_modules("client_core").await?;
+        create_npm_process()
+            .arg("run")
+            .arg("build")
+            .current_dir("./packages/client_core")
+            .spawn()
+            .expect("failed to build client_core")
+            .await?;
     } else if matches.is_present("admin-tauri") {
         create_tauri_process()
             .arg("build")
@@ -75,30 +103,40 @@ async fn build(matches: &ArgMatches<'_>) -> Result<(), Box<dyn std::error::Error
             .spawn()
             .expect("failed to build new_admin_tauri")
             .await?;
+    } else if matches.is_present("client-tauri") {
+        create_tauri_process()
+            .arg("build")
+            .current_dir("./packages/client_tauri")
+            .spawn()
+            .expect("failed to build client_tauri")
+            .await?;
     } else if matches.is_present("go-server") {
         compile_go_server().await?;
         if matches.is_present("move") {
             move_file(&go_server_path, &admin_core_path).await?;
         }
     } else {
+        /* This is not working cuz vue-plugin-tauri was not updated in the
+        time of this commit */
+
         // Go Server Compile
-        compile_go_server().await?;
-        move_file(&go_server_path, &admin_core_path).await?;
+        // compile_go_server().await?;
+        // move_file(&go_server_path, &admin_core_path).await?;
 
-        check_node_modules("admin_core").await?;
+        // check_node_modules("admin_core").await?;
 
-        create_symlinks()?;
+        // create_symlinks()?;
 
-        // npm run tauri:build
-        create_npm_process()
-            .arg("run")
-            .arg("tauri:build")
-            .current_dir("./packages/admin_core")
-            .spawn()
-            .expect("failed to build tauri")
-            .await?;
+        // // npm run tauri:build
+        // create_npm_process()
+        //     .arg("run")
+        //     .arg("tauri:build")
+        //     .current_dir("./packages/admin_core")
+        //     .spawn()
+        //     .expect("failed to build tauri")
+        //     .await?;
 
-        remove_symlinks()?;
+        // remove_symlinks()?;
     }
 
     Ok(())
@@ -111,9 +149,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Arg::with_name("admin-core")
             .long("admin-core")
             .help("admin_core"),
+        Arg::with_name("client-core")
+            .long("client-core")
+            .help("client_core"),
         Arg::with_name("admin-tauri")
             .long("admin-tauri")
             .help("admin_tauri"),
+        Arg::with_name("client-tauri")
+            .long("client-tauri")
+            .help("client_tauri"),
         Arg::with_name("go-server")
             .long("go-server")
             .help("go-server"),

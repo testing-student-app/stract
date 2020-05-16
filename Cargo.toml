@@ -6,6 +6,7 @@ members = [
 
 exclude = [
   "packages/admin_core/src-tauri",
-  "packages/admin_tauri/src-tauri",
+  "packages/client_core/src-tauri",
+  "packages/client_tauri/src-tauri",
   "packages/new_admin_tauri/src-tauri"
 ]
