@@ -18,8 +18,7 @@ const WebSocketPlugin = ({ store }) => {
         });
 
         socket.addEventListener('error', () => {
-          console.log('failed');
-          store.dispatch('setServerStatus', 'connected');
+          store.dispatch('setServerStatus', 'failed');
         });
       };
       store.dispatch('startServer', port).then(({ good_ok: goodOk }) => {
@@ -37,7 +36,7 @@ const WebSocketPlugin = ({ store }) => {
       if (!socket) return;
       const data = {
         action: actionName,
-        data: payload,
+        payload,
       };
       socket.send(JSON.stringify(data));
     },

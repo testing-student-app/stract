@@ -18,6 +18,7 @@ Vue.use(ConfirmPlugin);
 Vue.config.productionTip = false;
 
 // fucking IE
+/* eslint-disable no-console */
 window.log = console.log;
 
 new Vue({

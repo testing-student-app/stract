@@ -1,6 +1,6 @@
 [[questions]]
+_showDetails = false
 question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
-several_answers = false
 
 [[questions.answers]]
 right = false
@@ -14,56 +14,42 @@ text = '1234'
 right = true
 text = '1235'
 
-[[questions.answers]]
-right = false
-text = '1236'
+[[questions]]
+answers = []
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
 
 [[questions]]
 answers = []
 question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
-several_answers = false
 
 [[questions]]
 answers = []
 question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
-several_answers = true
 
 [[questions]]
 answers = []
 question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
-several_answers = false
 
 [[questions]]
 answers = []
 question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
-several_answers = false
 
 [[questions]]
 answers = []
 question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
-several_answers = false
 
 [[questions]]
 answers = []
 question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
-several_answers = false
 
 [[questions]]
 answers = []
 question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
-several_answers = false
 
 [[questions]]
 answers = []
 question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
-several_answers = false
 
 [[questions]]
 answers = []
 question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
-several_answers = false
-
-[[questions]]
-answers = []
-question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
-several_answers = false

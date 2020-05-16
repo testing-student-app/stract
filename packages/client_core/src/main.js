@@ -16,6 +16,7 @@ Vue.use(WebSocketPlugin, { store });
 Vue.config.productionTip = false;
 
 // fucking IE
+/* eslint-disable no-console */
 window.log = console.log;
 
 new Vue({

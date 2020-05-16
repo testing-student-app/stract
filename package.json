@@ -14,6 +14,6 @@
     "build:admin-tauri": "cargo xtask build --admin-tauri",
     "build:client-core": "cargo xtask build --client-core",
     "build:client-tauri": "cargo xtask build --client-tauri",
-    "build:go-server": "cargo xtask dev --go-server --move"
+    "build:go-server": "cargo xtask build --go-server --move"
   }
 }
