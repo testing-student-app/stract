@@ -1,6 +1,8 @@
 <template>
   <b-list-group>
-    <b-list-group-item v-for="u in users" :key="u">{{ u }}</b-list-group-item>
+    <b-list-group-item v-for="u in users" :key="u.remote_addr">
+      {{ u.name || u.remote_addr }}
+    </b-list-group-item>
   </b-list-group>
 </template>
 

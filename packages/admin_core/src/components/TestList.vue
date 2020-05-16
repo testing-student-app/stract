@@ -12,8 +12,8 @@
           </template>
 
           <template v-slot:cell(actions)="row">
-            <b-button size="sm" @click="row.toggleDetails">
-              {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
+            <b-button size="sm" variant="info" @click="row.toggleDetails">
+              {{ row.detailsShowing ? 'Hide' : 'Show' }} answers
             </b-button>
           </template>
 

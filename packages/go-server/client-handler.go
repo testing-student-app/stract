@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/mitchellh/mapstructure"
+)
+
 // ClienHandler ...
 type ClienHandler struct {
 	handler *Handler
@@ -14,10 +18,24 @@ func NewClientHndler(handler *Handler) *ClienHandler {
 
 // Register ...
 func (ch *ClienHandler) Register() {
-	ch.handler.On("test", ch.Test)
+	ch.handler.On("setname", ch.SetName)
 }
 
-// Test ...
-func (ch *ClienHandler) Test(c *Client, p interface{}) {
-	c.send <- []byte("hi from test")
+// SetName ...
+func (ch *ClienHandler) SetName(c *Client, p interface{}) {
+	type Payload struct {
+		Name string `json:"name"`
+	}
+
+	payload := Payload{}
+
+	mapstructure.Decode(p, &payload)
+
+	d, ok := c.hub.clients[c]
+
+	if ok {
+		d.Name = payload.Name
+	}
+
+	c.hub.handler.InternalEmit("clientlist", c.hub.admin, nil)
 }
