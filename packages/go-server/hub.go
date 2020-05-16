@@ -1,10 +1,12 @@
 package main
 
+import "gitlab.com/Reidond/stract/models"
+
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
 	// Registered clients.
-	clients map[*Client]string
+	clients map[*Client]*models.ClientData
 
 	admin *Client
 
@@ -25,7 +27,7 @@ func newHub(h *Handler) *Hub {
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		clients:    make(map[*Client]string),
+		clients:    make(map[*Client]*models.ClientData),
 		admin:      nil,
 		handler:    h,
 	}
@@ -36,8 +38,11 @@ func (h *Hub) run() {
 		select {
 		case client := <-h.register:
 			if !client.admin {
-				h.clients[client] = client.conn.RemoteAddr().String()
-				h.handler.InternalEmit("clientlist", client, nil)
+				h.clients[client] = &models.ClientData{
+					RemoteAddr: client.conn.RemoteAddr().String(),
+					Name:       "",
+				}
+				h.handler.InternalEmit("clientlist", h.admin, nil)
 			} else {
 				h.admin = client
 			}
@@ -45,7 +50,7 @@ func (h *Hub) run() {
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
-				h.handler.InternalEmit("clientlist", client, nil)
+				h.handler.InternalEmit("clientlist", h.admin, nil)
 			} else {
 				close(client.send)
 			}

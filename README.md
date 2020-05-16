@@ -4,6 +4,6 @@
 
 For more friendly development purposes we created xtask scripts:
 
-Run `cargo xtask serve` to produce debug build
+Run `yarn dev` to produce debug build
 
-Run `cargo xtask build` to produce release build
+Run `yarn build` to produce release build

@@ -28,16 +28,10 @@ export default {
     }),
   },
 
-  watch: {
-    serverLoaded: {
-      handler(val) {
-        if (val) {
-          this.setServerStatus('started');
-          this.$ws.connect(`ws://127.0.0.1:${this.serverPort}/ws/a`);
-        }
-      },
-      immediate: true,
-    },
+  watch: {},
+
+  mounted() {
+    this.$ws.connect(`ws://127.0.0.1:port/ws/a`);
   },
 
   beforeCreate() {

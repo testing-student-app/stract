@@ -5,8 +5,16 @@
       "path": "packages/admin_core"
     },
     {
+      "name": "Client Core",
+      "path": "packages/client_core"
+    },
+    {
       "name": "Admin Tauri",
-      "path": "packages/admin_tauri"
+      "path": "packages/new_admin_tauri/src-tauri"
+    },
+    {
+      "name": "Client Tauri",
+      "path": "packages/client_tauri/src-tauri"
     },
     {
       "name": "Go Server",

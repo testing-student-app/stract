@@ -1,0 +1,55 @@
+[[questions]]
+_showDetails = false
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
+
+[[questions.answers]]
+right = false
+text = '123'
+
+[[questions.answers]]
+right = true
+text = '1234'
+
+[[questions.answers]]
+right = true
+text = '1235'
+
+[[questions]]
+answers = []
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
+
+[[questions]]
+answers = []
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
+
+[[questions]]
+answers = []
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
+
+[[questions]]
+answers = []
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
+
+[[questions]]
+answers = []
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
+
+[[questions]]
+answers = []
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
+
+[[questions]]
+answers = []
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
+
+[[questions]]
+answers = []
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
+
+[[questions]]
+answers = []
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
+
+[[questions]]
+answers = []
+question = 'Lorem ipsum dolor sit amet consectetur, adipisicing elit.'
