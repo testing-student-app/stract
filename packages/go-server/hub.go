@@ -37,7 +37,7 @@ func (h *Hub) run() {
 		case client := <-h.register:
 			if !client.admin {
 				h.clients[client] = client.conn.RemoteAddr().String()
-				h.handler.InternalEmit("clientlist", client, nil)
+				h.handler.InternalEmit("clientlist", h.admin, nil)
 			} else {
 				h.admin = client
 			}
@@ -45,7 +45,7 @@ func (h *Hub) run() {
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
-				h.handler.InternalEmit("clientlist", client, nil)
+				h.handler.InternalEmit("clientlist", h.admin, nil)
 			} else {
 				close(client.send)
 			}
