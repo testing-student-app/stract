@@ -47,6 +47,8 @@ pub fn remove_nanoids(mut table: toml::Value) -> toml::Value {
     .map(|v: &toml::value::Value| {
       let mut v_cloned = v.clone();
       v_cloned.as_table_mut().unwrap().remove("id");
+      // Remove `several_answers`
+      v_cloned.as_table_mut().unwrap().remove("several_answers");
       v_cloned.as_table().unwrap().clone()
     })
     .collect::<Vec<toml::value::Table>>();

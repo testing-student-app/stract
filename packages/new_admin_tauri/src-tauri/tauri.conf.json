@@ -1,7 +1,7 @@
 {
   "build": {
     "distDir": "../../admin_core/dist",
-    "devPath": "http://localhost:8080",
+    "devPath": "http://localhost:8010",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
   },
