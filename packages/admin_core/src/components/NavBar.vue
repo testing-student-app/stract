@@ -24,6 +24,7 @@
       <b-button-toolbar
         aria-label="Toolbar with button groups and dropdown menu"
       >
+        <new-question-modal class="mr-2" />
         <b-dropdown variant="primary" right>
           <template v-slot:button-content>
             File
@@ -42,9 +43,14 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import NewQuestionModal from './NewQuestionModal.vue';
 
 export default {
   name: 'NavBar',
+
+  components: {
+    NewQuestionModal,
+  },
 
   computed: {
     ...mapState({

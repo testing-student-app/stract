@@ -15,6 +15,8 @@ import {
   ButtonGroupPlugin,
   TablePlugin,
   ToastPlugin,
+  ModalPlugin,
+  FormGroupPlugin,
 } from 'bootstrap-vue';
 
 Vue.use(TablePlugin);
@@ -32,3 +34,5 @@ Vue.use(ButtonPlugin);
 Vue.use(FormTextareaPlugin);
 Vue.use(ListGroupPlugin);
 Vue.use(ToastPlugin);
+Vue.use(ModalPlugin);
+Vue.use(FormGroupPlugin);

@@ -11,14 +11,27 @@
             <span>{{ item.answers.length }}</span>
           </template>
 
-          <template v-slot:cell(actions)="row">
-            <b-button size="sm" variant="info" @click="row.toggleDetails">
-              {{ row.detailsShowing ? 'Hide' : 'Show' }} answers
+          <template
+            v-slot:cell(actions)="{ toggleDetails, detailsShowing, item }"
+          >
+            <b-button
+              size="sm"
+              variant="info"
+              class="mr-2"
+              @click="toggleDetails"
+            >
+              {{ detailsShowing ? 'Hide' : 'Show' }} answers
             </b-button>
+            <b-button
+              size="sm"
+              variant="danger"
+              @click="deleteQuestion(item.id)"
+              >Delete</b-button
+            >
           </template>
 
           <template v-slot:row-details="{ item }">
-            <AnswerList :item="item" />
+            <AnswerList :id="item.id" />
           </template>
         </b-table>
       </b-col>
@@ -27,7 +40,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 import AnswerList from './AnswerList.vue';
 
@@ -58,6 +71,34 @@ export default {
     ...mapState({
       tests: state => state.tests.testsTomlData.questions,
     }),
+  },
+
+  methods: {
+    ...mapActions({
+      removeQuestion: 'removeQuestion',
+    }),
+    deleteQuestion(id) {
+      this.$bvModal
+        .msgBoxConfirm(
+          'Please confirm that you want to delete this question.',
+          {
+            title: 'Please Confirm',
+            size: 'sm',
+            buttonSize: 'sm',
+            okVariant: 'danger',
+            okTitle: 'YES',
+            cancelTitle: 'NO',
+            footerClass: 'p-2',
+            hideHeaderClose: false,
+            centered: true,
+          },
+        )
+        .then(value => {
+          if (value) {
+            this.removeQuestion(id);
+          }
+        });
+    },
   },
 };
 </script>

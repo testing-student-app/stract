@@ -1,5 +1,4 @@
 import tauri from 'tauri/api';
-import { nanoid } from 'nanoid';
 
 const state = {
   path: '',
@@ -17,9 +16,7 @@ const actions = {
   newFile({ commit }) {
     commit('SET_PATH', '');
     commit('SET_TESTS', {
-      questions: [
-        { id: nanoid(), question: '', several_answers: false, answers: [] },
-      ],
+      questions: [],
     });
   },
   openFile({ commit }) {

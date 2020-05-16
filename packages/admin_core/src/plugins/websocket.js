@@ -1,7 +1,7 @@
 const WebSocketPlugin = ({ store }) => {
   /** @type {WebSocket} */
   let socket = null;
-  const port = 8082;
+  const port = 8090;
 
   return {
     connect(url) {

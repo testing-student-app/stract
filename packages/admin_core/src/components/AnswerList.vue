@@ -10,7 +10,7 @@
           <b-iconstack
             font-scale="2"
             class="mr-2"
-            @click="toggleRight(`${item.id}${i}`, answer)"
+            @click="toggleRight(`${item.id}${i}`)"
           >
             <b-icon
               v-if="getState(`${item.id}${i}`, 'edit')"
@@ -19,8 +19,8 @@
             ></b-icon>
             <b-icon
               stacked
-              :icon="answer.right ? 'check' : 'x'"
-              :variant="answer.right ? 'success' : 'danger'"
+              :icon="answerRight(`${item.id}${i}`, i) ? 'check' : 'x'"
+              :variant="answerRight(`${item.id}${i}`, i) ? 'success' : 'danger'"
             ></b-icon>
           </b-iconstack>
           <span v-if="!getState(`${item.id}${i}`, 'edit')">
@@ -28,7 +28,7 @@
           </span>
           <b-form-input
             v-if="getState(`${item.id}${i}`, 'edit')"
-            v-model="answer.text"
+            v-model="answerCopy.text"
             placeholder="Enter your answer"
           ></b-form-input>
         </div>
@@ -51,7 +51,7 @@
           <span
             v-if="!getState(`${item.id}${i}`)"
             class="del-btn px-1"
-            @click="remove(`${item.id}${i}`, i, item.answers)"
+            @click="remove(`${item.id}${i}`, i)"
           >
             <b-icon icon="trash"></b-icon>
             <span class="pl-1">Delete</span>
@@ -65,12 +65,7 @@
       </div>
     </b-list-group-item>
     <b-list-group-item class="d-flex align-items-center justify-content-center">
-      <b-button
-        squared
-        block
-        variant="light"
-        @click="add(item.id, item.answers)"
-      >
+      <b-button squared block variant="light" @click="add(item.id)">
         <b-icon icon="plus"></b-icon>
         Add answer
       </b-button>
@@ -79,21 +74,40 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex';
+import { deepcopy } from '../helpers';
+
 export default {
   props: {
-    item: {
-      type: Object,
-      default: null,
+    id: {
+      type: String,
+      default: '',
     },
   },
 
   data() {
     return {
+      prevAdded: false,
+      answerCopy: {},
       confirmMode: {},
     };
   },
 
+  computed: {
+    ...mapState({
+      questions: state => state.tests.testsTomlData.questions,
+    }),
+    item() {
+      return this.questions.find(v => v.id === this.id);
+    },
+  },
+
   methods: {
+    ...mapActions({
+      addNewAnswer: 'addNewAnswer',
+      editAnswer: 'editAnswer',
+      deleteAnswer: 'deleteAnswer',
+    }),
     getState(id, state = 'confirm') {
       if (this.confirmMode[id]) {
         return this.confirmMode[id][state];
@@ -125,12 +139,19 @@ export default {
         ...newState,
       };
     },
-    toggleRight(id, answer) {
+    answerRight(id, i) {
       if (this.getState(id, 'edit')) {
-        answer.right = !answer.right;
+        return this.answerCopy.right;
+      }
+      return this.item.answers[i].right;
+    },
+    toggleRight(id) {
+      if (this.getState(id, 'edit')) {
+        this.answerCopy.right = !this.answerCopy.right;
       }
     },
     ok(id) {
+      this.prevAdded = false;
       if (this.getState(id, 'edit')) {
         this.$confirm('ok', `edit${id}`);
       } else if (this.getState(id)) {
@@ -144,30 +165,46 @@ export default {
         this.$confirm('cancel', `remove${id}`);
       }
     },
-    add(id, answers) {
-      answers.push({
-        text: '',
-        right: false,
+    add(id) {
+      this.prevAdded = true;
+      this.addNewAnswer({
+        id,
+        data: {
+          text: '',
+          right: false,
+        },
       });
-      this.edit(`${id}${answers.length - 1}`, answers.length - 1);
+      this.edit(
+        `${id}${this.item.answers.length - 1}`,
+        this.item.answers.length - 1,
+      );
     },
     edit(id, i) {
+      this.answerCopy = deepcopy(this.item.answers[i]);
       this.toggleConfirmMode(id, 'edit');
       this.$confirm(`edit${id}`)
         .then(() => {
           this.toggleConfirmMode(id);
-          console.log(i);
+          this.editAnswer({
+            id: this.id,
+            i,
+            data: this.answerCopy,
+          });
         })
         .catch(() => {
           this.toggleConfirmMode(id);
+          if (this.prevAdded) {
+            this.deleteAnswer({ id: this.id, i });
+            this.prevAdded = false;
+          }
         });
     },
-    remove(id, i, answers) {
+    remove(id, i) {
       this.toggleConfirmMode(id);
       this.$confirm(`remove${id}`)
         .then(() => {
           this.toggleConfirmMode(id);
-          answers.splice(i, 1);
+          this.deleteAnswer({ id: this.id, i });
         })
         .catch(() => {
           this.toggleConfirmMode(id);
